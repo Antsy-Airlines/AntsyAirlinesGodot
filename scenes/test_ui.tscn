@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://bbv3epliq7o38"]
+
+[ext_resource type="Script" uid="uid://bqyud3p6smr8" path="res://scripts/test_ui.gd" id="1_fmaql"]
+
+[node name="TestUi" type="Node2D" unique_id=2010646079]
+script = ExtResource("1_fmaql")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=53322190]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MakeServer" type="Button" parent="VBoxContainer" unique_id=1923139425]
+layout_mode = 2
+text = "Make Server"
+
+[node name="MakeClient" type="Button" parent="VBoxContainer" unique_id=81703249]
+layout_mode = 2
+text = "Make Client
+"
+
+[connection signal="pressed" from="VBoxContainer/MakeServer" to="." method="_on_make_server_pressed"]
+[connection signal="pressed" from="VBoxContainer/MakeClient" to="." method="_on_make_client_pressed"]

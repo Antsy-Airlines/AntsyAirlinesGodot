@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://dmrcysj3x53c7"]
+
+[ext_resource type="PackedScene" uid="uid://cqqdt12w2nyjb" path="res://assets/low_poly_char_export.glb" id="1_3vyb7"]
+[ext_resource type="Script" uid="uid://cvotlvxygyy8x" path="res://scripts/player.gd" id="1_g2els"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dkdl3"]
+height = 2.583496
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_g2els"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[node name="Player" type="CharacterBody3D" unique_id=428772832]
+script = ExtResource("1_g2els")
+
+[node name="low_poly_char_export" parent="." unique_id=1884614376 instance=ExtResource("1_3vyb7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.0051272, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=423192372]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18530273, 0)
+shape = SubResource("CapsuleShape3D_dkdl3")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1369421758]
+transform = Transform3D(-1, 0, -8.742278e-08, -2.9843047e-08, 0.9399309, 0.34136468, 8.217137e-08, 0.34136468, -0.9399309, 0, 1.6370485, -2.391729)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1413111630]
+replication_config = SubResource("SceneReplicationConfig_g2els")
