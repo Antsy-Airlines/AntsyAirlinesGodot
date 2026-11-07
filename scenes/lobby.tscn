@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://55i3gkkvqg7w"]
 
+[ext_resource type="Script" uid="uid://ck4h6akr32dkx" path="res://scenes/lobby.gd" id="1_nqcc7"]
 [ext_resource type="Script" uid="uid://bw5434bbp0smc" path="res://scripts/high_level_player_spawner.gd" id="1_o1atq"]
 [ext_resource type="PackedScene" uid="uid://dmrcysj3x53c7" path="res://scenes/player.tscn" id="2_5gu6x"]
-[ext_resource type="PackedScene" uid="uid://bbv3epliq7o38" path="res://scenes/test_ui.tscn" id="3_q60fs"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_dkdl3"]
 size = Vector3(18, 0.2, 18)
@@ -11,6 +11,7 @@ size = Vector3(18, 0.2, 18)
 size = Vector3(18, 0.2, 18)
 
 [node name="lobby" type="Node3D" unique_id=1416941139]
+script = ExtResource("1_nqcc7")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1871252254]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, 0)
@@ -31,5 +32,3 @@ _spawnable_scenes = PackedStringArray("uid://dmrcysj3x53c7")
 spawn_path = NodePath("..")
 script = ExtResource("1_o1atq")
 network_player = ExtResource("2_5gu6x")
-
-[node name="TestUi" parent="." unique_id=2010646079 instance=ExtResource("3_q60fs")]
