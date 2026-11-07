@@ -9,6 +9,16 @@ const DEFAULT_HOST: String = "3.133.100.208" # change to "localhost for local te
 var peer: ENetMultiplayerPeer
 
 
+func _ready() -> void:
+	# Server-side signals
+	multiplayer.peer_connected.connect(_on_peer_connected)
+	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	# Client-side signals
+	multiplayer.connected_to_server.connect(_on_connected_to_server)
+	multiplayer.connection_failed.connect(_on_connection_failed)
+	multiplayer.server_disconnected.connect(_on_server_disconnected)
+
+
 func start_server() -> void:
 	peer = ENetMultiplayerPeer.new()
 	var err: Error = peer.create_server(PORT)
@@ -35,7 +45,8 @@ func start_client() -> void:
 ##   2. ANTSY_HOST environment variable
 ##   3. DEFAULT_HOST const
 func get_host() -> String:
-	for arg: String in OS.get_cmdline_args():
+	var args: PackedStringArray = OS.get_cmdline_args() + OS.get_cmdline_user_args()
+	for arg: String in args:
 		if arg.begins_with("--host="):
 			return arg.trim_prefix("--host=")
 
@@ -44,3 +55,23 @@ func get_host() -> String:
 		return env_host
 
 	return DEFAULT_HOST
+
+
+func _on_peer_connected(id: int) -> void:
+	print("[server] peer %d connected" % id)
+
+
+func _on_peer_disconnected(id: int) -> void:
+	print("[server] peer %d disconnected" % id)
+
+
+func _on_connected_to_server() -> void:
+	print("[client] connected, my id is %d" % multiplayer.get_unique_id())
+
+
+func _on_connection_failed() -> void:
+	print("[client] CONNECTION FAILED to %s:%d" % [get_host(), PORT])
+
+
+func _on_server_disconnected() -> void:
+	print("[client] server disconnected")
