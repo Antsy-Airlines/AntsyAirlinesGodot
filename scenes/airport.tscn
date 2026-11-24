@@ -1,0 +1,382 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/airport.gd" id="1_airport"]
+[ext_resource type="Material" path="res://assets/airport/airport_material.tres" id="2_mat"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/ad_stand.scn" id="3_ad_stand"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/airplane_1.scn" id="4_airplane_1"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/airplane_2.scn" id="5_airplane_2"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/airplane_3.scn" id="6_airplane_3"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/airplane_4.scn" id="7_airplane_4"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/airplane_stairs.scn" id="8_airplane_stairs"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/backpack.scn" id="9_backpack"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/baggage_container.scn" id="10_baggage_container"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/baggage_truck_1.scn" id="11_baggage_truck_1"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/baggage_truck_2.scn" id="12_baggage_truck_2"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/baggage_truck_3.scn" id="13_baggage_truck_3"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/boarding_desk.scn" id="14_boarding_desk"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/cafe.scn" id="15_cafe"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/chairs.scn" id="16_chairs"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/check_in_desk.scn" id="17_check_in_desk"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/check_in_kiosk.scn" id="18_check_in_kiosk"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/control_tower.scn" id="19_control_tower"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/departure_sign.scn" id="20_departure_sign"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/fire_truck.scn" id="21_fire_truck"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/hangar.scn" id="22_hangar"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/jet_bridge.scn" id="23_jet_bridge"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/luggage_trolley.scn" id="24_luggage_trolley"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/passenger_bus.scn" id="25_passenger_bus"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/plant.scn" id="26_plant"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/queue_post_belt.scn" id="27_queue_post_belt"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/runway_straight.scn" id="28_runway_straight"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/security_camera.scn" id="29_security_camera"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/security_check.scn" id="30_security_check"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/suitcase.scn" id="31_suitcase"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/terminal_1.scn" id="32_terminal_1"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/terminal_2.scn" id="33_terminal_2"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/ticket_machine.scn" id="34_ticket_machine"]
+[ext_resource type="PackedScene" path="res://assets/airport/pieces/trash_can.scn" id="35_trash_can"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_top_color = Color(0.32, 0.52, 0.82, 1)
+sky_horizon_color = Color(0.72, 0.8, 0.9, 1)
+ground_bottom_color = Color(0.3, 0.33, 0.3, 1)
+ground_horizon_color = Color(0.72, 0.8, 0.9, 1)
+
+[sub_resource type="Sky" id="Sky_sky"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_sky"]
+background_mode = 2
+sky = SubResource("Sky_sky")
+ambient_light_source = 3
+tonemap_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grass"]
+albedo_color = Color(0.42, 0.56, 0.32, 1)
+roughness = 1.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_grass"]
+material = SubResource("StandardMaterial3D_grass")
+size = Vector2(1200, 1200)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_apron"]
+albedo_color = Color(0.5, 0.5, 0.52, 1)
+roughness = 1.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_apron"]
+material = SubResource("StandardMaterial3D_apron")
+size = Vector2(200, 320)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(1200, 1, 1200)
+
+[node name="Airport" type="Node3D"]
+script = ExtResource("1_airport")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_sky")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.383022, 0.321394, 0, 0.642788, 0.766044, -0.5, -0.663414, 0.556670, 0, 60, 0)
+shadow_enabled = true
+directional_shadow_max_distance = 150.0
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="Grass" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("PlaneMesh_grass")
+
+[node name="Apron" type="MeshInstance3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 0.01, 0)
+mesh = SubResource("PlaneMesh_apron")
+
+[node name="Shape" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="Buildings" type="Node3D" parent="."]
+
+[node name="Terminal1" parent="Buildings" instance=ExtResource("32_terminal_1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -94.58, 0, -28.86)
+
+[node name="Terminal2" parent="Buildings" instance=ExtResource("33_terminal_2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -94.59, 0.01, 52.83)
+
+[node name="Hangar" parent="Buildings" instance=ExtResource("22_hangar")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -94.6, 0, 127.63)
+
+[node name="ControlTower" parent="Buildings" instance=ExtResource("19_control_tower")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -94.57, 0.14, -91.39)
+
+[node name="Runways" type="Node3D" parent="."]
+
+[node name="RunwayNorth" parent="Runways" instance=ExtResource("28_runway_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130, 0.03, -134.6)
+
+[node name="RunwaySouth" parent="Runways" instance=ExtResource("28_runway_straight")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130, 0.03, 134.6)
+
+[node name="Planes" type="Node3D" parent="."]
+
+[node name="Airplane1" parent="Planes" instance=ExtResource("4_airplane_1")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -21.2, 0, 111.78)
+
+[node name="Airplane2" parent="Planes" instance=ExtResource("5_airplane_2")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -13.5, 0, 38.36)
+
+[node name="Airplane3" parent="Planes" instance=ExtResource("6_airplane_3")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -19.9, 0, -32.58)
+
+[node name="Airplane4" parent="Planes" instance=ExtResource("7_airplane_4")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -41.8, 0, -93.57)
+
+[node name="JetBridge" parent="Planes" instance=ExtResource("23_jet_bridge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -49.6, 0, -28.9)
+
+[node name="AirplaneStairs" parent="Planes" instance=ExtResource("8_airplane_stairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0, -86)
+
+[node name="Vehicles" type="Node3D" parent="."]
+
+[node name="PassengerBus" parent="Vehicles" instance=ExtResource("25_passenger_bus")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 56.83, 0, 82.45)
+
+[node name="FireTruck" parent="Vehicles" instance=ExtResource("21_fire_truck")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57, 0, 95.61)
+
+[node name="BaggageTruck1" parent="Vehicles" instance=ExtResource("11_baggage_truck_1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 66.34, 0, 68.74)
+
+[node name="BaggageTruck2" parent="Vehicles" instance=ExtResource("12_baggage_truck_2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 57.41, 0, 68.74)
+
+[node name="BaggageTruck3" parent="Vehicles" instance=ExtResource("13_baggage_truck_3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.81, 0, 68.74)
+
+[node name="BaggageContainer1" parent="Vehicles" instance=ExtResource("10_baggage_container")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.65, 0, 34.55)
+
+[node name="BaggageContainer2" parent="Vehicles" instance=ExtResource("10_baggage_container")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.65, 0, 25.55)
+
+[node name="BaggageContainer3" parent="Vehicles" instance=ExtResource("10_baggage_container")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.65, 0, 16.55)
+
+[node name="BaggageContainer4" parent="Vehicles" instance=ExtResource("10_baggage_container")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.65, 0, 7.55)
+
+[node name="BaggageContainer5" parent="Vehicles" instance=ExtResource("10_baggage_container")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 55.65, 0, -1.45)
+
+[node name="Terminal1Inside" type="Node3D" parent="."]
+
+[node name="CheckInDesk1" parent="Terminal1Inside" instance=ExtResource("17_check_in_desk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -107, 0.42, -48)
+
+[node name="CheckInDesk2" parent="Terminal1Inside" instance=ExtResource("17_check_in_desk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -107, 0.42, -40)
+
+[node name="CheckInDesk3" parent="Terminal1Inside" instance=ExtResource("17_check_in_desk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -107, 0.42, -32)
+
+[node name="QueuePost1" parent="Terminal1Inside" instance=ExtResource("27_queue_post_belt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -101, 0.42, -50.5)
+
+[node name="QueuePost2" parent="Terminal1Inside" instance=ExtResource("27_queue_post_belt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -101, 0.42, -47)
+
+[node name="QueuePost3" parent="Terminal1Inside" instance=ExtResource("27_queue_post_belt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -101, 0.42, -43.5)
+
+[node name="QueuePost4" parent="Terminal1Inside" instance=ExtResource("27_queue_post_belt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -101, 0.42, -40)
+
+[node name="QueuePost5" parent="Terminal1Inside" instance=ExtResource("27_queue_post_belt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -101, 0.42, -36.5)
+
+[node name="QueuePost6" parent="Terminal1Inside" instance=ExtResource("27_queue_post_belt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -101, 0.42, -33)
+
+[node name="QueuePost7" parent="Terminal1Inside" instance=ExtResource("27_queue_post_belt")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -101, 0.42, -29.5)
+
+[node name="Kiosk1" parent="Terminal1Inside" instance=ExtResource("18_check_in_kiosk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -106, 0.42, -22)
+
+[node name="Kiosk2" parent="Terminal1Inside" instance=ExtResource("18_check_in_kiosk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -106, 0.42, -20)
+
+[node name="Kiosk3" parent="Terminal1Inside" instance=ExtResource("18_check_in_kiosk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -106, 0.42, -18)
+
+[node name="Cafe" parent="Terminal1Inside" instance=ExtResource("15_cafe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -105, 0.42, -9)
+
+[node name="SecurityCheck1" parent="Terminal1Inside" instance=ExtResource("30_security_check")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -83, 0.42, -44)
+
+[node name="SecurityCheck2" parent="Terminal1Inside" instance=ExtResource("30_security_check")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -83, 0.42, -16)
+
+[node name="BoardingDesk" parent="Terminal1Inside" instance=ExtResource("14_boarding_desk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -74, 0.42, -34)
+
+[node name="ChairsA1" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -77, 0.42, -50)
+
+[node name="ChairsB1" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -75.4, 0.42, -50)
+
+[node name="ChairsA2" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -77, 0.42, -48)
+
+[node name="ChairsB2" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -75.4, 0.42, -48)
+
+[node name="ChairsA3" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -77, 0.42, -46)
+
+[node name="ChairsB3" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -75.4, 0.42, -46)
+
+[node name="ChairsA4" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -77, 0.42, -12)
+
+[node name="ChairsB4" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -75.4, 0.42, -12)
+
+[node name="ChairsA5" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -77, 0.42, -10)
+
+[node name="ChairsB5" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -75.4, 0.42, -10)
+
+[node name="ChairsA6" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -77, 0.42, -8)
+
+[node name="ChairsB6" parent="Terminal1Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -75.4, 0.42, -8)
+
+[node name="Plant1" parent="Terminal1Inside" instance=ExtResource("26_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -98, 0.42, -52)
+
+[node name="Plant2" parent="Terminal1Inside" instance=ExtResource("26_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -98, 0.42, -6)
+
+[node name="Plant3" parent="Terminal1Inside" instance=ExtResource("26_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -72, 0.42, -40)
+
+[node name="Plant4" parent="Terminal1Inside" instance=ExtResource("26_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -72, 0.42, -18)
+
+[node name="TrashCan1" parent="Terminal1Inside" instance=ExtResource("35_trash_can")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -92, 0.42, -52)
+
+[node name="TrashCan2" parent="Terminal1Inside" instance=ExtResource("35_trash_can")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -92, 0.42, -6)
+
+[node name="TrashCan3" parent="Terminal1Inside" instance=ExtResource("35_trash_can")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -79, 0.42, -30)
+
+[node name="AdStand1" parent="Terminal1Inside" instance=ExtResource("3_ad_stand")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -88, 0.42, -40)
+
+[node name="AdStand2" parent="Terminal1Inside" instance=ExtResource("3_ad_stand")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -88, 0.42, -18)
+
+[node name="DepartureSign1" parent="Terminal1Inside" instance=ExtResource("20_departure_sign")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0.42, -34)
+
+[node name="DepartureSign2" parent="Terminal1Inside" instance=ExtResource("20_departure_sign")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0.42, -24)
+
+[node name="LuggageTrolley1" parent="Terminal1Inside" instance=ExtResource("24_luggage_trolley")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -99, 0.42, -24)
+
+[node name="LuggageTrolley2" parent="Terminal1Inside" instance=ExtResource("24_luggage_trolley")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -99, 0.42, -22.5)
+
+[node name="Suitcase" parent="Terminal1Inside" instance=ExtResource("31_suitcase")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -103.5, 0.42, -45)
+
+[node name="Backpack" parent="Terminal1Inside" instance=ExtResource("9_backpack")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -103.5, 0.42, -37)
+
+[node name="TicketMachine" parent="Terminal1Inside" instance=ExtResource("34_ticket_machine")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -110, 0.42, -26)
+
+[node name="SecurityCamera" parent="Terminal1Inside" instance=ExtResource("29_security_camera")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -71.5, 4.42, -29)
+
+[node name="Terminal2Inside" type="Node3D" parent="."]
+
+[node name="ChairsA1" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -82, 0.42, 40)
+
+[node name="ChairsB1" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -80.4, 0.42, 40)
+
+[node name="ChairsA2" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -82, 0.42, 42)
+
+[node name="ChairsB2" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -80.4, 0.42, 42)
+
+[node name="ChairsA3" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -82, 0.42, 44)
+
+[node name="ChairsB3" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -80.4, 0.42, 44)
+
+[node name="ChairsA4" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -82, 0.42, 62)
+
+[node name="ChairsB4" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -80.4, 0.42, 62)
+
+[node name="ChairsA5" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -82, 0.42, 64)
+
+[node name="ChairsB5" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -80.4, 0.42, 64)
+
+[node name="ChairsA6" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -82, 0.42, 66)
+
+[node name="ChairsB6" parent="Terminal2Inside" instance=ExtResource("16_chairs")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -80.4, 0.42, 66)
+
+[node name="Plant1" parent="Terminal2Inside" instance=ExtResource("26_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -108, 0.42, 24)
+
+[node name="Plant2" parent="Terminal2Inside" instance=ExtResource("26_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -108, 0.42, 82)
+
+[node name="Plant3" parent="Terminal2Inside" instance=ExtResource("26_plant")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -80, 0.42, 53)
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="Spawn1" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -92, 0.6, -33)
+
+[node name="Spawn2" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -92, 0.6, -30.5)
+
+[node name="Spawn3" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -92, 0.6, -28)
+
+[node name="Spawn4" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -92, 0.6, -25.5)
+
+[node name="Spawn5" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -89.5, 0.6, -33)
+
+[node name="Spawn6" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -89.5, 0.6, -30.5)
+
+[node name="Spawn7" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -89.5, 0.6, -28)
+
+[node name="Spawn8" type="Marker3D" parent="SpawnPoints"]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -89.5, 0.6, -25.5)
