@@ -2,6 +2,7 @@ extends Node
 
 signal player_joined(id: int, user_name: String) # server: a player passed the name check
 signal player_left(id: int) # server: a player with a name left
+signal lobby_joined(code: String) # client: the server let us in, code is the lobby code ("" if none)
 
 const PORT: int = 42069
 ## Fallback used when no --host arg and no ANTSY_HOST env var is present.
@@ -14,10 +15,17 @@ const TITLE_SCENE: String = "res://scenes/title_screen.tscn" # where players go 
 const CONNECT_TIMEOUT: float = 5.0 # seconds to wait for the server before giving up
 const KICK_DELAY: float = 2.0 # seconds before kicking a refused player, so the reason reaches them first
 
+# Declaring lobby room variables
+const MAX_PLAYERS: int = 8 # most players allowed in one lobby
+const EMPTY_TIMEOUT: float = 60.0 # seconds a room can stay empty before it shuts down
+
 var peer: ENetMultiplayerPeer
 var username: String = "" # name typed on the title screen
 var last_error: String = "" # message the title screen shows after we get sent back
+var room_code: String = "" # code of this lobby (server: from --code, client: sent on join)
 var _names: Dictionary = {} # server only: peer id -> username
+var _is_room: bool = false # server only: started with --room, so it closes when empty
+var _time_empty: float = 0.0 # server only: how long the room has had nobody in it
 
 
 func _ready() -> void:
@@ -30,26 +38,53 @@ func _ready() -> void:
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
 
 
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	# only lobby rooms shut down on their own
+	if not _is_room:
+		return
+
+	# counting how long nobody has been in the room
+	if not _names.is_empty():
+		_time_empty = 0.0
+		return
+	_time_empty += delta
+
+	if _time_empty >= EMPTY_TIMEOUT:
+		print("[room %s] empty for %.0f s, shutting down" % [room_code, EMPTY_TIMEOUT])
+		get_tree().quit()
+
+
 func start_server() -> void:
+	var port: int = get_port()
+
+	# remembering if this server is a lobby room and what its code is
+	_is_room = "--room" in OS.get_cmdline_args() + OS.get_cmdline_user_args()
+	room_code = get_arg("--code=").to_upper()
+
 	peer = ENetMultiplayerPeer.new()
-	var err: Error = peer.create_server(PORT)
+	var err: Error = peer.create_server(port)
 	if err != OK:
-		push_error("Failed to create server on port %d: %s" % [PORT, error_string(err)])
+		push_error("Failed to create server on port %d: %s" % [port, error_string(err)])
+		get_tree().quit(1) # a room that can't listen is useless, so closing it
 		return
 	multiplayer.multiplayer_peer = peer
-	print("Server listening on UDP port %d" % PORT)
+	print("Server listening on UDP port %d" % port)
+	if _is_room:
+		print("[room %s] waiting for players (max %d)" % [room_code, MAX_PLAYERS])
 
 
 func start_client() -> void:
 	var host: String = get_host()
+	var port: int = get_port()
 	peer = ENetMultiplayerPeer.new()
-	var err: Error = peer.create_client(host, PORT)
+	var err: Error = peer.create_client(host, port)
 	if err != OK:
-		push_error("Failed to create client for %s:%d: %s" % [host, PORT, error_string(err)])
+		push_error("Failed to create client for %s:%d: %s" % [host, port, error_string(err)])
 		_back_to_title.call_deferred("Can't reach the server.")
 		return
 	multiplayer.multiplayer_peer = peer
-	print("Client connecting to %s:%d" % [host, PORT])
+	print("Client connecting to %s:%d" % [host, port])
 
 	# giving up if the server doesn't answer in time
 	var time_left = get_tree().create_timer(CONNECT_TIMEOUT)
@@ -71,6 +106,39 @@ func get_host() -> String:
 		return env_host
 
 	return DEFAULT_HOST
+
+
+func get_port() -> int:
+	## This function gives the port from --port=<number>, or the normal PORT
+	var port_arg = get_arg("--port=")
+
+	# if no port was given or it isn't a number
+	if not port_arg.is_valid_int():
+		return PORT
+
+	return port_arg.to_int()
+
+
+func get_arg(key: String) -> String:
+	## This function finds a --key=value argument and gives back the value ("" if missing)
+	# key: the start of the argument, like "--code="
+	var args = OS.get_cmdline_args() + OS.get_cmdline_user_args()
+	for arg in args:
+		if arg.begins_with(key):
+			return arg.trim_prefix(key)
+	return ""
+
+
+func is_server_launch() -> bool:
+	## This function says if the game was started as a server (--server or --room)
+	var args = OS.get_cmdline_args() + OS.get_cmdline_user_args()
+	return "--server" in args or "--room" in args
+
+
+func leave_lobby() -> void:
+	## This function leaves the lobby on purpose and goes back to the title screen
+	print("[client] leaving the lobby")
+	_back_to_title("")
 
 
 func _on_peer_connected(id: int) -> void:
@@ -102,6 +170,11 @@ func _request_join(user_name: String) -> void:
 	if _names.has(id):
 		return
 
+	# checking if there is space left in the lobby
+	if _names.size() >= MAX_PLAYERS:
+		_refuse(id, "This lobby is full (%d players)." % MAX_PLAYERS)
+		return
+
 	# checking the name with the same rules as the title screen
 	var name_err = TitleScreen.check_name(user_name)
 	if name_err != "":
@@ -111,8 +184,17 @@ func _request_join(user_name: String) -> void:
 	# giving the player a name nobody else has
 	var final_name = unique_name(user_name.strip_edges(), _names.values())
 	_names[id] = final_name
-	print("[server] peer %d joined as %s" % [id, final_name])
+	print("[server] peer %d joined as %s (%d/%d)" % [id, final_name, _names.size(), MAX_PLAYERS])
+	_join_accepted.rpc_id(id, room_code) # telling the player which lobby they are in
 	player_joined.emit(id, final_name)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _join_accepted(code: String) -> void:
+	## This function runs on the client when the server lets it in
+	# code: the lobby code to show on screen ("" for a server without one)
+	room_code = code
+	lobby_joined.emit(code)
 
 
 @rpc("authority", "call_remote", "reliable")
@@ -154,7 +236,7 @@ static func unique_name(wanted: String, taken: Array) -> String:
 
 
 func _on_connection_failed() -> void:
-	print("[client] CONNECTION FAILED to %s:%d" % [get_host(), PORT])
+	print("[client] CONNECTION FAILED to %s:%d" % [get_host(), get_port()])
 	_back_to_title.call_deferred("Can't reach the server.")
 
 
@@ -193,4 +275,5 @@ func _back_to_title(msg: String) -> void:
 
 	# going back with the message
 	last_error = msg
+	room_code = "" # we are not in a lobby anymore
 	get_tree().change_scene_to_file(TITLE_SCENE)
