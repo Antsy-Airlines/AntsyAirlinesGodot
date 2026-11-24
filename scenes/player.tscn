@@ -5,6 +5,7 @@
 [ext_resource type="Animation" uid="uid://2btn0e6cw72b" path="res://assets/Animations/idle.res" id="3_qlg0r"]
 [ext_resource type="Animation" uid="uid://1l7cb5bqx3hh" path="res://assets/Animations/walk.res" id="4_tuyoq"]
 [ext_resource type="Animation" uid="uid://xisnijjceav5" path="res://assets/Animations/fall.res" id="5_tuyoq"]
+[ext_resource type="Script" uid="uid://dfg2jjb4cku35" path="res://scripts/camera_controller.gd" id="6_camctl"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dkdl3"]
 radius = 0.3071289
@@ -20,6 +21,9 @@ properties/1/replication_mode = 1
 properties/2/path = NodePath(".:velocity_proxy")
 properties/2/spawn = true
 properties/2/replication_mode = 1
+properties/3/path = NodePath(".:rotation")
+properties/3/spawn = true
+properties/3/replication_mode = 1
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f6mlu"]
 resource_name = "Material"
@@ -143,8 +147,22 @@ script = ExtResource("1_g2els")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0277398, 0)
 shape = SubResource("CapsuleShape3D_dkdl3")
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1369421758]
-transform = Transform3D(-1, 0, -8.742278e-08, -2.9843047e-08, 0.939931, 0.3413647, 8.217137e-08, 0.3413647, -0.9399309, 0, 2.0852451, -1.4929348)
+[node name="CameraPivot" type="Node3D" parent="." unique_id=1369421758]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 1.75, 0)
+script = ExtResource("6_camctl")
+
+[node name="FirstPersonCamera" type="Camera3D" parent="CameraPivot" unique_id=1369421759]
+
+[node name="BackArm" type="SpringArm3D" parent="CameraPivot" unique_id=1369421760]
+spring_length = 4.0
+
+[node name="BackCamera" type="Camera3D" parent="CameraPivot/BackArm" unique_id=1369421761]
+
+[node name="FrontArm" type="SpringArm3D" parent="CameraPivot" unique_id=1369421762]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+spring_length = 4.0
+
+[node name="FrontCamera" type="Camera3D" parent="CameraPivot/FrontArm" unique_id=1369421763]
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1413111630]
 replication_config = SubResource("SceneReplicationConfig_g2els")
@@ -159,7 +177,7 @@ bones/0/name = "Bone"
 bones/0/parent = -1
 bones/0/rest = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.3841858e-07, 0)
 bones/0/enabled = true
-bones/0/position = Vector3(0, 0.016961094, 0)
+bones/0/position = Vector3(0, 0, 0)
 bones/0/rotation = Quaternion(0, 0, 0, 1)
 bones/0/scale = Vector3(1, 1, 1)
 bones/1/name = "Bone.001"
@@ -346,3 +364,4 @@ skeleton = NodePath("..")
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1860310674]
 root_node = NodePath("../CharacterMesh")
 libraries/ = SubResource("AnimationLibrary_cwg0e")
+playback_default_blend_time = 0.2

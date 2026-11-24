@@ -16,7 +16,8 @@ func _update_animation() -> void:
 		animation_player.speed_scale = 1
 		animation_player.play("fall")
 	elif velocity_proxy.length() > 0.1:
-		if velocity_proxy.z > 0:
+		# compare against facing (rig faces local +Z) so it holds after mouse-look turns the body
+		if velocity_proxy.dot(transform.basis.z) > 0:
 			animation_player.speed_scale = 1
 			animation_player.play("Walk")
 		else:
@@ -30,10 +31,8 @@ func _physics_process(delta: float) -> void:
 	_update_animation()
 
 	if !is_multiplayer_authority():
-		$Camera3D.clear_current()
 		return
 
-	$Camera3D.make_current()
 	# Add the gravity.
 	if not is_on_floor():
 		velocity += get_gravity() * delta
