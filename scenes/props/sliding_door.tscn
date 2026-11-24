@@ -1,0 +1,80 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/props/sliding_door.gd" id="1_door"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_glass"]
+transparency = 1
+albedo_color = Color(0.68, 0.82, 0.95, 0.35)
+roughness = 0.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_frame"]
+albedo_color = Color(0.14, 0.18, 0.33, 1)
+roughness = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_pane"]
+material = SubResource("StandardMaterial3D_glass")
+size = Vector3(1.9, 4.25, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_edge"]
+material = SubResource("StandardMaterial3D_frame")
+size = Vector3(0.08, 4.25, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pane"]
+size = Vector3(1.9, 4.25, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sensor"]
+size = Vector3(7.6, 3, 7)
+
+[node name="SlidingDoor" type="Node3D"]
+script = ExtResource("1_door")
+
+[node name="LeftFixed" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.85, 2.125, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="LeftFixed"]
+mesh = SubResource("BoxMesh_pane")
+
+[node name="Shape" type="CollisionShape3D" parent="LeftFixed"]
+shape = SubResource("BoxShape3D_pane")
+
+[node name="RightFixed" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.85, 2.125, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="RightFixed"]
+mesh = SubResource("BoxMesh_pane")
+
+[node name="Shape" type="CollisionShape3D" parent="RightFixed"]
+shape = SubResource("BoxShape3D_pane")
+
+[node name="LeftPanel" type="AnimatableBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.95, 2.125, -0.12)
+
+[node name="Mesh" type="MeshInstance3D" parent="LeftPanel"]
+mesh = SubResource("BoxMesh_pane")
+
+[node name="Edge" type="MeshInstance3D" parent="LeftPanel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.91, 0, 0)
+mesh = SubResource("BoxMesh_edge")
+
+[node name="Shape" type="CollisionShape3D" parent="LeftPanel"]
+shape = SubResource("BoxShape3D_pane")
+
+[node name="RightPanel" type="AnimatableBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 2.125, -0.12)
+
+[node name="Mesh" type="MeshInstance3D" parent="RightPanel"]
+mesh = SubResource("BoxMesh_pane")
+
+[node name="Edge" type="MeshInstance3D" parent="RightPanel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.91, 0, 0)
+mesh = SubResource("BoxMesh_edge")
+
+[node name="Shape" type="CollisionShape3D" parent="RightPanel"]
+shape = SubResource("BoxShape3D_pane")
+
+[node name="Sensor" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="Sensor"]
+shape = SubResource("BoxShape3D_sensor")
