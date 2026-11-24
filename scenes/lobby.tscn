@@ -14,16 +14,18 @@ size = Vector3(18, 0.2, 18)
 [node name="lobby" type="Node3D" unique_id=1416941139]
 script = ExtResource("1_nqcc7")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1871252254]
+[node name="LobbyRoom" type="Node3D" parent="."]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="LobbyRoom" unique_id=1871252254]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D" unique_id=2003588792]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LobbyRoom/StaticBody3D" unique_id=2003588792]
 mesh = SubResource("BoxMesh_dkdl3")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=893337205]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LobbyRoom/StaticBody3D" unique_id=893337205]
 shape = SubResource("BoxShape3D_dkdl3")
 
-[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=22346205]
+[node name="SpotLight3D" type="SpotLight3D" parent="LobbyRoom" unique_id=22346205]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 6.9355536, 0)
 light_color = Color(0.8472303, 0.8377795, 0, 1)
 spot_range = 19.98497

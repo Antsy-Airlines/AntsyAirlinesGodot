@@ -3,6 +3,8 @@ extends Node
 signal player_joined(id: int, user_name: String) # server: a player passed the name check
 signal player_left(id: int) # server: a player with a name left
 signal lobby_joined(code: String) # client: the server let us in, code is the lobby code ("" if none)
+signal room_state_changed(host: int, count: int, started: bool) # client: host, player count or start changed
+signal game_started # everyone: the host started the game, time to load the airport
 
 const PORT: int = 42069
 ## Fallback used when no --host arg and no ANTSY_HOST env var is present.
@@ -16,7 +18,8 @@ const CONNECT_TIMEOUT: float = 5.0 # seconds to wait for the server before givin
 const KICK_DELAY: float = 2.0 # seconds before kicking a refused player, so the reason reaches them first
 
 # Declaring lobby room variables
-const MAX_PLAYERS: int = 8 # most players allowed in one lobby
+const MAX_PLAYERS: int = 4 # most players allowed in one lobby (the game is for 2-4 friends)
+const MIN_PLAYERS: int = 1 # players needed before the host can start (1 so the host can also play alone)
 const EMPTY_TIMEOUT: float = 60.0 # seconds a room can stay empty before it shuts down
 const GAME_VERSION: int = 1 # raise this when servers and players must update together
 const STATUS_TIME: float = 2.0 # seconds between a room's ALIVE reports to the front desk
@@ -26,7 +29,12 @@ var username: String = "" # name typed on the title screen
 var last_error: String = "" # message the title screen shows after we get sent back
 var room_code: String = "" # code of this lobby (server: from --code, client: sent on join)
 var room_port: int = 0 # client only: room port the front desk sent us to (0 = use --port / PORT)
+var host_id: int = 0 # peer who can start the game (the room's creator, or the next player if they leave)
+var player_count: int = 0 # client: how many players are in the lobby
+var is_started: bool = false # true once the host started the game
+var my_slot: int = 0 # client: which airport spawn point is ours
 var _names: Dictionary = {} # server only: peer id -> username
+var _slots: Dictionary = {} # server only: peer id -> spawn slot
 var _is_room: bool = false # server only: started with --room, so it closes when empty
 var _time_empty: float = 0.0 # server only: how long the room has had nobody in it
 var _status_udp: PacketPeerUDP # room only: sends READY / ALIVE to the front desk
@@ -184,7 +192,14 @@ func _on_peer_disconnected(id: int) -> void:
 	if not _names.has(id):
 		return
 	_names.erase(id)
+	_slots.erase(id) # their spawn point is free again
 	player_left.emit(id)
+
+	# handing the host to the player who has been here longest
+	if id == host_id:
+		host_id = _names.keys()[0] if not _names.is_empty() else 0
+		print("[server] host left, new host is %d" % host_id)
+	_send_room_state()
 
 
 func _on_connected_to_server() -> void:
@@ -216,17 +231,92 @@ func _request_join(user_name: String) -> void:
 	# giving the player a name nobody else has
 	var final_name = unique_name(user_name.strip_edges(), _names.values())
 	_names[id] = final_name
+	_slots[id] = _free_slot()
+
+	# the first player in made the room, so they are the host
+	if host_id == 0:
+		host_id = id
 	print("[server] peer %d joined as %s (%d/%d)" % [id, final_name, _names.size(), MAX_PLAYERS])
-	_join_accepted.rpc_id(id, room_code) # telling the player which lobby they are in
+
+	_join_accepted.rpc_id(id, room_code, _slots[id], is_started) # telling the player which lobby they are in
 	player_joined.emit(id, final_name)
+	_send_room_state()
 
 
 @rpc("authority", "call_remote", "reliable")
-func _join_accepted(code: String) -> void:
+func _join_accepted(code: String, slot: int, started: bool) -> void:
 	## This function runs on the client when the server lets it in
 	# code: the lobby code to show on screen ("" for a server without one)
+	# slot: our spawn point in the airport
+	# started: true if the game already started, so we go straight to the airport
 	room_code = code
+	my_slot = slot
 	lobby_joined.emit(code)
+
+	# a late joiner skips the waiting room
+	if started:
+		is_started = true
+		game_started.emit()
+
+
+func _free_slot() -> int:
+	## This function finds the lowest spawn slot nobody is using
+	for slot in MAX_PLAYERS:
+		if not slot in _slots.values():
+			return slot
+	return 0
+
+
+func _send_room_state() -> void:
+	## This function tells every player who the host is, how many are in, and if the game started
+	_room_state.rpc(host_id, _names.size(), is_started)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _room_state(host: int, count: int, started: bool) -> void:
+	## This function runs on the client when the lobby changes
+	# host: peer id of the host
+	# count: players in the lobby
+	# started: true once the game started
+	host_id = host
+	player_count = count
+	room_state_changed.emit(host, count, started)
+
+
+func is_host() -> bool:
+	## This function says if we are the one who can start the game
+	return host_id != 0 and host_id == multiplayer.get_unique_id()
+
+
+func request_start() -> void:
+	## This function asks the server to start the game (only works for the host)
+	_request_start.rpc_id(1)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _request_start() -> void:
+	## This function runs on the server when the host presses Start
+	var id = multiplayer.get_remote_sender_id()
+
+	# Guard case for someone who isn't the host, or a game that already started
+	if id != host_id or is_started:
+		return
+
+	# Guard case for too few players
+	if _names.size() < MIN_PLAYERS:
+		print("[server] start refused, only %d player(s)" % _names.size())
+		return
+
+	print("[room %s] host %d started the game with %d players" % [room_code, id, _names.size()])
+	_start_game.rpc()
+	_send_room_state()
+
+
+@rpc("authority", "call_local", "reliable")
+func _start_game() -> void:
+	## This function runs on everyone (server too) when the game starts
+	is_started = true
+	game_started.emit()
 
 
 @rpc("authority", "call_remote", "reliable")
@@ -309,4 +399,8 @@ func _back_to_title(msg: String) -> void:
 	last_error = msg
 	room_code = "" # we are not in a lobby anymore
 	room_port = 0 # the next lobby gets its own port from the front desk
+	host_id = 0
+	player_count = 0
+	is_started = false
+	my_slot = 0
 	get_tree().change_scene_to_file(TITLE_SCENE)
