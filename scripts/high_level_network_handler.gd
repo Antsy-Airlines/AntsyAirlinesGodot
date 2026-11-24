@@ -3,7 +3,7 @@ extends Node
 const PORT: int = 42069
 ## Fallback used when no --host arg and no ANTSY_HOST env var is present.
 ## Point this at your EC2 Elastic IP (or a domain pointing at it) before shipping builds.
-const DEFAULT_HOST: String = "3.133.100.208" # change to "localhost for local testing w/ multiple run instances
+const DEFAULT_HOST: String = "localhost" # change to "localhost for local testing w/ multiple run instances
 # !EC2 instance changes public api when you stop/start it
 
 var peer: ENetMultiplayerPeer

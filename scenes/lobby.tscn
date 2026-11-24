@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://55i3gkkvqg7w"]
 
-[ext_resource type="Script" uid="uid://ck4h6akr32dkx" path="res://scenes/lobby.gd" id="1_nqcc7"]
+[ext_resource type="Script" uid="uid://ck4h6akr32dkx" path="res://scripts/lobby.gd" id="1_nqcc7"]
 [ext_resource type="Script" uid="uid://bw5434bbp0smc" path="res://scripts/high_level_player_spawner.gd" id="1_o1atq"]
 [ext_resource type="PackedScene" uid="uid://dmrcysj3x53c7" path="res://scenes/player.tscn" id="2_5gu6x"]
+[ext_resource type="PackedScene" uid="uid://dbvpyckjty08c" path="res://scenes/JohnDavisRig.glb" id="4_nqcc7"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_dkdl3"]
 size = Vector3(18, 0.2, 18)
@@ -32,3 +33,6 @@ _spawnable_scenes = PackedStringArray("uid://dmrcysj3x53c7")
 spawn_path = NodePath("..")
 script = ExtResource("1_o1atq")
 network_player = ExtResource("2_5gu6x")
+
+[node name="JohnDavisRig" parent="." unique_id=1850977289 instance=ExtResource("4_nqcc7")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, -3.8974977, 6.824607)

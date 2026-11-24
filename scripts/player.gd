@@ -3,11 +3,32 @@ extends CharacterBody3D
 
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
+@export var on_floor: bool
+@export var velocity_proxy: Vector3 = Vector3.ZERO
+@onready var char_mesh = $CharacterMesh
+@onready var animation_player = $AnimationPlayer
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
 
+func _update_animation() -> void:
+	if not on_floor:
+		animation_player.speed_scale = 1
+		animation_player.play("fall")
+	elif velocity_proxy.length() > 0.1:
+		if velocity_proxy.z > 0:
+			animation_player.speed_scale = 1
+			animation_player.play("Walk")
+		else:
+			animation_player.speed_scale = -1
+			animation_player.play("Walk")
+	else:
+		animation_player.play("Idle")
+
 func _physics_process(delta: float) -> void:
+	# test playing animation
+	_update_animation()
+
 	if !is_multiplayer_authority():
 		$Camera3D.clear_current()
 		return
@@ -34,3 +55,5 @@ func _physics_process(delta: float) -> void:
 		velocity.z = move_toward(velocity.z, 0, SPEED)
 
 	move_and_slide()
+	on_floor = is_on_floor()
+	velocity_proxy = velocity	
