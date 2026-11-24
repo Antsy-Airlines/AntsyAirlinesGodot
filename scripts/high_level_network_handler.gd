@@ -18,14 +18,19 @@ const KICK_DELAY: float = 2.0 # seconds before kicking a refused player, so the 
 # Declaring lobby room variables
 const MAX_PLAYERS: int = 8 # most players allowed in one lobby
 const EMPTY_TIMEOUT: float = 60.0 # seconds a room can stay empty before it shuts down
+const GAME_VERSION: int = 1 # raise this when servers and players must update together
+const STATUS_TIME: float = 2.0 # seconds between a room's ALIVE reports to the front desk
 
 var peer: ENetMultiplayerPeer
 var username: String = "" # name typed on the title screen
 var last_error: String = "" # message the title screen shows after we get sent back
 var room_code: String = "" # code of this lobby (server: from --code, client: sent on join)
+var room_port: int = 0 # client only: room port the front desk sent us to (0 = use --port / PORT)
 var _names: Dictionary = {} # server only: peer id -> username
 var _is_room: bool = false # server only: started with --room, so it closes when empty
 var _time_empty: float = 0.0 # server only: how long the room has had nobody in it
+var _status_udp: PacketPeerUDP # room only: sends READY / ALIVE to the front desk
+var _time_status: float = 0.0 # room only: time since the last ALIVE report
 
 
 func _ready() -> void:
@@ -44,6 +49,12 @@ func _process(delta: float) -> void:
 	if not _is_room:
 		return
 
+	# telling the front desk we are still alive and how full we are
+	_time_status += delta
+	if _time_status >= STATUS_TIME:
+		_time_status = 0.0
+		_send_status("ALIVE")
+
 	# counting how long nobody has been in the room
 	if not _names.is_empty():
 		_time_empty = 0.0
@@ -59,7 +70,7 @@ func start_server() -> void:
 	var port: int = get_port()
 
 	# remembering if this server is a lobby room and what its code is
-	_is_room = "--room" in OS.get_cmdline_args() + OS.get_cmdline_user_args()
+	_is_room = has_flag("--room")
 	room_code = get_arg("--code=").to_upper()
 
 	peer = ENetMultiplayerPeer.new()
@@ -72,6 +83,18 @@ func start_server() -> void:
 	print("Server listening on UDP port %d" % port)
 	if _is_room:
 		print("[room %s] waiting for players (max %d)" % [room_code, MAX_PLAYERS])
+
+		# telling the front desk this room is listening
+		_status_udp = PacketPeerUDP.new()
+		_status_udp.set_dest_address("127.0.0.1", LobbyDirectory.STATUS_PORT)
+		_send_status("READY")
+
+
+func _send_status(kind: String) -> void:
+	## This function sends "KIND CODE players" to the front desk on this computer
+	# kind: "READY" when the room starts, "ALIVE" every few seconds after
+	var msg = "%s %s %d" % [kind, room_code, _names.size()]
+	_status_udp.put_packet(msg.to_utf8_buffer())
 
 
 func start_client() -> void:
@@ -109,7 +132,11 @@ func get_host() -> String:
 
 
 func get_port() -> int:
-	## This function gives the port from --port=<number>, or the normal PORT
+	## This function gives the room port from the front desk, then --port=<number>, then the normal PORT
+	# if the front desk sent us to a room
+	if room_port != 0:
+		return room_port
+
 	var port_arg = get_arg("--port=")
 
 	# if no port was given or it isn't a number
@@ -129,10 +156,15 @@ func get_arg(key: String) -> String:
 	return ""
 
 
+func has_flag(flag: String) -> bool:
+	## This function says if a plain flag like "--room" was on the command line
+	# flag: the flag to look for
+	return flag in OS.get_cmdline_args() + OS.get_cmdline_user_args()
+
+
 func is_server_launch() -> bool:
 	## This function says if the game was started as a server (--server or --room)
-	var args = OS.get_cmdline_args() + OS.get_cmdline_user_args()
-	return "--server" in args or "--room" in args
+	return has_flag("--server") or has_flag("--room")
 
 
 func leave_lobby() -> void:
@@ -276,4 +308,5 @@ func _back_to_title(msg: String) -> void:
 	# going back with the message
 	last_error = msg
 	room_code = "" # we are not in a lobby anymore
+	room_port = 0 # the next lobby gets its own port from the front desk
 	get_tree().change_scene_to_file(TITLE_SCENE)
