@@ -6,7 +6,13 @@ const PORT: int = 42069
 const DEFAULT_HOST: String = "localhost" # change to "localhost for local testing w/ multiple run instances
 # !EC2 instance changes public api when you stop/start it
 
+# Declaring title screen variables
+const TITLE_SCENE: String = "res://scenes/title_screen.tscn" # where players go back to when the connection breaks
+const CONNECT_TIMEOUT: float = 5.0 # seconds to wait for the server before giving up
+
 var peer: ENetMultiplayerPeer
+var username: String = "" # name typed on the title screen
+var last_error: String = "" # message the title screen shows after we get sent back
 
 
 func _ready() -> void:
@@ -35,9 +41,14 @@ func start_client() -> void:
 	var err: Error = peer.create_client(host, PORT)
 	if err != OK:
 		push_error("Failed to create client for %s:%d: %s" % [host, PORT, error_string(err)])
+		_back_to_title.call_deferred("Can't reach the server.")
 		return
 	multiplayer.multiplayer_peer = peer
 	print("Client connecting to %s:%d" % [host, PORT])
+
+	# giving up if the server doesn't answer in time
+	var time_left = get_tree().create_timer(CONNECT_TIMEOUT)
+	time_left.timeout.connect(_on_connect_timeout.bind(peer))
 
 
 ## Resolve which server to connect to, in priority order:
@@ -71,7 +82,42 @@ func _on_connected_to_server() -> void:
 
 func _on_connection_failed() -> void:
 	print("[client] CONNECTION FAILED to %s:%d" % [get_host(), PORT])
+	_back_to_title.call_deferred("Can't reach the server.")
 
 
 func _on_server_disconnected() -> void:
 	print("[client] server disconnected")
+	_back_to_title.call_deferred("Lost connection to the server.")
+
+
+func _on_connect_timeout(old_peer: ENetMultiplayerPeer) -> void:
+	## This function gives up on a connection that is taking too long
+	# old_peer: the connection that started the timer
+
+	# if this timer is from an older try, or we already connected
+	if old_peer != peer:
+		return
+	if peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
+		return
+
+	print("[client] gave up after %.0f s" % CONNECT_TIMEOUT)
+	_back_to_title("Can't reach the server.")
+
+
+func _back_to_title(msg: String) -> void:
+	## This function closes the connection and sends the player back to the title screen
+	# msg: what to tell the player on the title screen
+
+	# Guard case for when we already went back
+	if peer == null:
+		return
+
+	# closing the connection
+	var old_peer = peer
+	peer = null
+	multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
+	old_peer.close()
+
+	# going back with the message
+	last_error = msg
+	get_tree().change_scene_to_file(TITLE_SCENE)
