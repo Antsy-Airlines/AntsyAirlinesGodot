@@ -64,6 +64,11 @@ const NAMES := {
 }
 const NO_COLLISION := ["runway_straight", "runway_curve_long", "runway_curve_round", "runway_curve_small", "runway_angled"] # flat, the ground handles them
 
+# piece name -> boxes (piece-local, metres) whose triangles are cut out of the mesh and the collision
+const CUTS := {
+	"terminal_1": [AABB(Vector3(19.0, 0.45, -3.8), Vector3(0.2, 4.2, 7.6))], # airside entrance glass, a sliding door goes here
+}
+
 # Declaring tracking variables
 var _pack: Node3D # the loaded pack, kept until the first frame
 var _done: bool = false # true once the pieces are saved
@@ -151,14 +156,17 @@ func _save_piece(piece_name: String, mesh_node: MeshInstance3D, colliders: Array
 	var piece = StaticBody3D.new() if wants_body else Node3D.new()
 	piece.name = piece_name.to_pascal_case()
 
+	var cuts = CUTS.get(piece_name, []) # openings to cut out of this piece
+
 	# the visible mesh, moved so the piece's pivot is at 0,0,0
-	var mesh = mesh_node.mesh.duplicate()
+	var look_xf = Transform3D(mesh_node.global_basis, mesh_node.global_position - origin)
+	var mesh = _cut_mesh(mesh_node.mesh, look_xf, cuts) if not cuts.is_empty() else mesh_node.mesh.duplicate()
 	for i in mesh.get_surface_count():
 		mesh.surface_set_material(i, mat)
 	var look = MeshInstance3D.new()
 	look.name = "Mesh"
 	look.mesh = mesh
-	look.transform = Transform3D(mesh_node.global_basis, mesh_node.global_position - origin)
+	look.transform = look_xf
 	piece.add_child(look)
 	look.owner = piece
 
@@ -166,8 +174,11 @@ func _save_piece(piece_name: String, mesh_node: MeshInstance3D, colliders: Array
 	if wants_body:
 		var shape = CollisionShape3D.new()
 		shape.name = "Shape"
-		shape.shape = collider.mesh.create_trimesh_shape()
 		shape.transform = Transform3D(collider.global_basis, collider.global_position - origin)
+		var trimesh = collider.mesh.create_trimesh_shape()
+		trimesh.set_faces(_cut_faces(trimesh.get_faces(), shape.transform, cuts))
+		trimesh.backface_collision = true # the pack's walls are one-sided, so players walked out through them and got stuck
+		shape.shape = trimesh
 		piece.add_child(shape)
 		shape.owner = piece
 
@@ -176,6 +187,56 @@ func _save_piece(piece_name: String, mesh_node: MeshInstance3D, colliders: Array
 	scene.pack(piece)
 	ResourceSaver.save(scene, "%s/%s.scn" % [OUT_DIR, piece_name])
 	piece.free() # the saved file has it now
+
+
+func _cut_mesh(mesh: Mesh, xf: Transform3D, cuts: Array) -> ArrayMesh:
+	## This function rebuilds a mesh without the triangles that sit inside the cut boxes
+	# mesh: the pack's visible mesh
+	# xf: where the mesh sits inside the piece
+	# cuts: boxes to cut out, in piece space
+	var cut_mesh = ArrayMesh.new()
+	for i in mesh.get_surface_count():
+		var arrays = mesh.surface_get_arrays(i)
+		var verts = arrays[Mesh.ARRAY_VERTEX]
+		var idx = arrays[Mesh.ARRAY_INDEX]
+
+		# a mesh without an index list gets one, so its triangles can be dropped the same way
+		if idx == null or idx.is_empty():
+			idx = PackedInt32Array(range(verts.size()))
+
+		# keeping every triangle whose middle is outside the cuts
+		var kept = PackedInt32Array()
+		for t in range(0, idx.size(), 3):
+			var mid = xf * ((verts[idx[t]] + verts[idx[t + 1]] + verts[idx[t + 2]]) / 3.0)
+			if not _in_cuts(mid, cuts):
+				kept.append_array([idx[t], idx[t + 1], idx[t + 2]])
+
+		arrays[Mesh.ARRAY_INDEX] = kept
+		cut_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	return cut_mesh
+
+
+func _cut_faces(faces: PackedVector3Array, xf: Transform3D, cuts: Array) -> PackedVector3Array:
+	## This function drops the collision triangles that sit inside the cut boxes
+	# faces: the collision triangles, three points each
+	# xf: where the collision sits inside the piece
+	# cuts: boxes to cut out, in piece space
+	var kept = PackedVector3Array()
+	for t in range(0, faces.size(), 3):
+		var mid = xf * ((faces[t] + faces[t + 1] + faces[t + 2]) / 3.0)
+		if not _in_cuts(mid, cuts):
+			kept.append_array([faces[t], faces[t + 1], faces[t + 2]])
+	return kept
+
+
+func _in_cuts(point: Vector3, cuts: Array) -> bool:
+	## This function says if a point is inside any of the cut boxes
+	# point: a triangle's middle, in piece space
+	# cuts: boxes to cut out
+	for box in cuts:
+		if box.has_point(point):
+			return true
+	return false
 
 
 func _find_collider(origin: Vector3, colliders: Array) -> MeshInstance3D:

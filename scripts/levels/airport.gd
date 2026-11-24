@@ -3,7 +3,7 @@ extends Node3D
 ## Players start inside terminal 1 at the spawn points.
 
 # Declaring Default/Const variables
-const PLAYER_SCENE := preload("res://scenes/player.tscn") # only used for the test player
+const PLAYER_SCENE := preload("res://scenes/player/player.tscn") # only used for the test player
 
 # Getting References for everyone in the scene
 @onready var _spawn_points: Node3D = $SpawnPoints # one Marker3D per player slot, inside terminal 1

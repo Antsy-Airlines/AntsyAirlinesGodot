@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/title_screen.gd" id="1_title"]
+[ext_resource type="Script" path="res://scripts/ui/title_screen.gd" id="1_title"]
 
 [sub_resource type="Gradient" id="Gradient_sky"]
 colors = PackedColorArray(0.14, 0.22, 0.38, 1, 0.04, 0.06, 0.12, 1)

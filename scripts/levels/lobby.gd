@@ -3,7 +3,7 @@ extends Node3D
 ## for the airport and every player moves to their own spawn point inside terminal 1.
 
 # Declaring Default/Const variables
-const AIRPORT_PATH := "res://scenes/airport.tscn" # the map the game starts in
+const AIRPORT_PATH := "res://scenes/levels/airport.tscn" # the map the game starts in
 
 # Getting References for everyone in the scene
 @onready var _lobby_room: Node3D = $LobbyRoom # floor and light of the waiting room
