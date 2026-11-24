@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/levels/airport_environment.tscn" id="1_airport"]
+[ext_resource type="PackedScene" path="res://scenes/levels/airplane_graybox.tscn" id="2_plane"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="3_player"]
+
+[sub_resource type="Environment" id="Environment_light"]
+background_mode = 1
+background_color = Color(0.56, 0.68, 0.79, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.75, 0.80, 0.87, 1)
+ambient_light_energy = 0.5
+
+[node name="LevelWalkthroughPreview" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_light")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-53, -28, 0)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="CabinLight" type="OmniLight3D" parent="."]
+position = Vector3(10, 2.25, -2)
+light_energy = 1.6
+omni_range = 15.0
+
+[node name="AirportEnvironment" parent="." instance=ExtResource("1_airport")]
+
+[node name="AirplaneGraybox" parent="." instance=ExtResource("2_plane")]
+position = Vector3(10, 0, -2)
+
+; Player with authority 1, for offline/local preview. Not a network player-spawn setup.
+[node name="1" parent="." instance=ExtResource("3_player")]
+position = Vector3(-15, 0.10, 6)

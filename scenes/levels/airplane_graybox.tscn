@@ -1,0 +1,324 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Mat_console"]
+albedo_color = Color(0.16, 0.21, 0.29, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_galley"]
+albedo_color = Color(0.73, 0.75, 0.77, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_load_zone"]
+albedo_color = Color(0.15, 0.67, 0.53, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_plane_floor"]
+albedo_color = Color(0.42, 0.48, 0.55, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_plane_wall"]
+albedo_color = Color(0.83, 0.85, 0.86, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_seat"]
+albedo_color = Color(0.12, 0.23, 0.42, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_G1"]
+size = Vector3(5.0, 0.24, 20.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G1"]
+size = Vector3(5.0, 0.24, 20.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G2"]
+size = Vector3(0.22, 2.7, 19.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G2"]
+size = Vector3(0.22, 2.7, 19.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G3"]
+size = Vector3(5.0, 2.7, 0.22)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G3"]
+size = Vector3(5.0, 2.7, 0.22)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G4"]
+size = Vector3(1.4, 2.5, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G4"]
+size = Vector3(1.4, 2.5, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G5"]
+size = Vector3(2.2, 1.25, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G5"]
+size = Vector3(2.2, 1.25, 0.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G6"]
+size = Vector3(1.15, 1.1, 1.05)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G6"]
+size = Vector3(1.15, 1.1, 1.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G7"]
+size = Vector3(1.0, 1.2, 1.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G7"]
+size = Vector3(1.0, 1.2, 1.1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G8"]
+size = Vector3(0.25, 1.7, 1.05)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G8"]
+size = Vector3(0.25, 1.7, 1.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G9"]
+size = Vector3(3.95, 1.5, 4.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G9"]
+size = Vector3(3.95, 1.5, 4.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G10"]
+size = Vector3(3.95, 0.04, 4.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G10"]
+size = Vector3(3.95, 0.04, 4.4)
+
+[node name="AirplaneGraybox" type="Node3D"]
+
+[node name="Structure" type="Node3D" parent="."]
+
+[node name="Floor" type="StaticBody3D" parent="Structure"]
+position = Vector3(0.0, -0.1, 0.0)
+
+[node name="Visual" type="MeshInstance3D" parent="Structure/Floor"]
+mesh = SubResource("BoxMesh_G1")
+material_override = SubResource("Mat_plane_floor")
+
+[node name="Collision" type="CollisionShape3D" parent="Structure/Floor"]
+shape = SubResource("BoxShape_G1")
+
+[node name="LeftWall" type="StaticBody3D" parent="Structure"]
+position = Vector3(-2.48, 1.35, -0.5)
+
+[node name="Visual" type="MeshInstance3D" parent="Structure/LeftWall"]
+mesh = SubResource("BoxMesh_G2")
+material_override = SubResource("Mat_plane_wall")
+
+[node name="Collision" type="CollisionShape3D" parent="Structure/LeftWall"]
+shape = SubResource("BoxShape_G2")
+
+[node name="RightWall" type="StaticBody3D" parent="Structure"]
+position = Vector3(2.48, 1.35, -0.5)
+
+[node name="Visual" type="MeshInstance3D" parent="Structure/RightWall"]
+mesh = SubResource("BoxMesh_G2")
+material_override = SubResource("Mat_plane_wall")
+
+[node name="Collision" type="CollisionShape3D" parent="Structure/RightWall"]
+shape = SubResource("BoxShape_G2")
+
+[node name="FrontNoseWall" type="StaticBody3D" parent="Structure"]
+position = Vector3(0.0, 1.35, -9.9)
+
+[node name="Visual" type="MeshInstance3D" parent="Structure/FrontNoseWall"]
+mesh = SubResource("BoxMesh_G3")
+material_override = SubResource("Mat_plane_wall")
+
+[node name="Collision" type="CollisionShape3D" parent="Structure/FrontNoseWall"]
+shape = SubResource("BoxShape_G3")
+
+[node name="CockpitDividerLeft" type="StaticBody3D" parent="Structure"]
+position = Vector3(-1.75, 1.25, -6.4)
+
+[node name="Visual" type="MeshInstance3D" parent="Structure/CockpitDividerLeft"]
+mesh = SubResource("BoxMesh_G4")
+material_override = SubResource("Mat_plane_wall")
+
+[node name="Collision" type="CollisionShape3D" parent="Structure/CockpitDividerLeft"]
+shape = SubResource("BoxShape_G4")
+
+[node name="CockpitDividerRight" type="StaticBody3D" parent="Structure"]
+position = Vector3(1.75, 1.25, -6.4)
+
+[node name="Visual" type="MeshInstance3D" parent="Structure/CockpitDividerRight"]
+mesh = SubResource("BoxMesh_G4")
+material_override = SubResource("Mat_plane_wall")
+
+[node name="Collision" type="CollisionShape3D" parent="Structure/CockpitDividerRight"]
+shape = SubResource("BoxShape_G4")
+
+[node name="Cockpit" type="Node3D" parent="."]
+
+[node name="FlightControls" type="StaticBody3D" parent="Cockpit"]
+position = Vector3(0.0, 0.8, -9.0)
+
+[node name="Visual" type="MeshInstance3D" parent="Cockpit/FlightControls"]
+mesh = SubResource("BoxMesh_G5")
+material_override = SubResource("Mat_console")
+
+[node name="Collision" type="CollisionShape3D" parent="Cockpit/FlightControls"]
+shape = SubResource("BoxShape_G5")
+
+[node name="Seats" type="Node3D" parent="."]
+
+[node name="SeatRow01_Left" type="StaticBody3D" parent="Seats"]
+position = Vector3(-1.55, 0.55, -4.65)
+
+[node name="Visual" type="MeshInstance3D" parent="Seats/SeatRow01_Left"]
+mesh = SubResource("BoxMesh_G6")
+material_override = SubResource("Mat_seat")
+
+[node name="Collision" type="CollisionShape3D" parent="Seats/SeatRow01_Left"]
+shape = SubResource("BoxShape_G6")
+
+[node name="SeatRow01_Right" type="StaticBody3D" parent="Seats"]
+position = Vector3(1.55, 0.55, -4.65)
+
+[node name="Visual" type="MeshInstance3D" parent="Seats/SeatRow01_Right"]
+mesh = SubResource("BoxMesh_G6")
+material_override = SubResource("Mat_seat")
+
+[node name="Collision" type="CollisionShape3D" parent="Seats/SeatRow01_Right"]
+shape = SubResource("BoxShape_G6")
+
+[node name="SeatRow02_Left" type="StaticBody3D" parent="Seats"]
+position = Vector3(-1.55, 0.55, -2.4)
+
+[node name="Visual" type="MeshInstance3D" parent="Seats/SeatRow02_Left"]
+mesh = SubResource("BoxMesh_G6")
+material_override = SubResource("Mat_seat")
+
+[node name="Collision" type="CollisionShape3D" parent="Seats/SeatRow02_Left"]
+shape = SubResource("BoxShape_G6")
+
+[node name="SeatRow02_Right" type="StaticBody3D" parent="Seats"]
+position = Vector3(1.55, 0.55, -2.4)
+
+[node name="Visual" type="MeshInstance3D" parent="Seats/SeatRow02_Right"]
+mesh = SubResource("BoxMesh_G6")
+material_override = SubResource("Mat_seat")
+
+[node name="Collision" type="CollisionShape3D" parent="Seats/SeatRow02_Right"]
+shape = SubResource("BoxShape_G6")
+
+[node name="SeatRow03_Left" type="StaticBody3D" parent="Seats"]
+position = Vector3(-1.55, 0.55, -0.15)
+
+[node name="Visual" type="MeshInstance3D" parent="Seats/SeatRow03_Left"]
+mesh = SubResource("BoxMesh_G6")
+material_override = SubResource("Mat_seat")
+
+[node name="Collision" type="CollisionShape3D" parent="Seats/SeatRow03_Left"]
+shape = SubResource("BoxShape_G6")
+
+[node name="SeatRow03_Right" type="StaticBody3D" parent="Seats"]
+position = Vector3(1.55, 0.55, -0.15)
+
+[node name="Visual" type="MeshInstance3D" parent="Seats/SeatRow03_Right"]
+mesh = SubResource("BoxMesh_G6")
+material_override = SubResource("Mat_seat")
+
+[node name="Collision" type="CollisionShape3D" parent="Seats/SeatRow03_Right"]
+shape = SubResource("BoxShape_G6")
+
+[node name="SeatRow04_Left" type="StaticBody3D" parent="Seats"]
+position = Vector3(-1.55, 0.55, 2.1)
+
+[node name="Visual" type="MeshInstance3D" parent="Seats/SeatRow04_Left"]
+mesh = SubResource("BoxMesh_G6")
+material_override = SubResource("Mat_seat")
+
+[node name="Collision" type="CollisionShape3D" parent="Seats/SeatRow04_Left"]
+shape = SubResource("BoxShape_G6")
+
+[node name="SeatRow04_Right" type="StaticBody3D" parent="Seats"]
+position = Vector3(1.55, 0.55, 2.1)
+
+[node name="Visual" type="MeshInstance3D" parent="Seats/SeatRow04_Right"]
+mesh = SubResource("BoxMesh_G6")
+material_override = SubResource("Mat_seat")
+
+[node name="Collision" type="CollisionShape3D" parent="Seats/SeatRow04_Right"]
+shape = SubResource("BoxShape_G6")
+
+[node name="ServiceStations" type="Node3D" parent="."]
+
+[node name="GalleyCounter" type="StaticBody3D" parent="ServiceStations"]
+position = Vector3(-1.75, 0.6, 4.15)
+
+[node name="Visual" type="MeshInstance3D" parent="ServiceStations/GalleyCounter"]
+mesh = SubResource("BoxMesh_G7")
+material_override = SubResource("Mat_galley")
+
+[node name="Collision" type="CollisionShape3D" parent="ServiceStations/GalleyCounter"]
+shape = SubResource("BoxShape_G7")
+
+[node name="ElectricalPanel" type="StaticBody3D" parent="ServiceStations"]
+position = Vector3(2.25, 1.0, 4.0)
+
+[node name="Visual" type="MeshInstance3D" parent="ServiceStations/ElectricalPanel"]
+mesh = SubResource("BoxMesh_G8")
+material_override = SubResource("Mat_console")
+
+[node name="Collision" type="CollisionShape3D" parent="ServiceStations/ElectricalPanel"]
+shape = SubResource("BoxShape_G8")
+
+[node name="Zones" type="Node3D" parent="."]
+
+[node name="RearCargoLoadingZone" type="Area3D" parent="Zones" groups=["cargo_loading_zone"]]
+position = Vector3(0.0, 0.75, 7.1)
+
+[node name="Collision" type="CollisionShape3D" parent="Zones/RearCargoLoadingZone"]
+shape = SubResource("BoxShape_G9")
+
+[node name="VisiblePad" type="Node3D" parent="Zones/RearCargoLoadingZone"]
+position = Vector3(0.0, -0.715, 0.0)
+
+[node name="Visual" type="MeshInstance3D" parent="Zones/RearCargoLoadingZone/VisiblePad"]
+mesh = SubResource("BoxMesh_G10")
+material_override = SubResource("Mat_load_zone")
+
+[node name="InteractionMarkers" type="Node3D" parent="."]
+
+[node name="TakeoffConsole" type="Marker3D" parent="InteractionMarkers"]
+position = Vector3(0.0, 1.1, -8.7)
+
+[node name="ElectricalPanel" type="Marker3D" parent="InteractionMarkers"]
+position = Vector3(2.0, 1.0, 4.0)
+
+[node name="FoodAndWater" type="Marker3D" parent="InteractionMarkers"]
+position = Vector3(-1.5, 1.0, 4.15)
+
+[node name="EmergencyDoor" type="Marker3D" parent="InteractionMarkers"]
+position = Vector3(2.3, 1.0, 0.4)
+
+[node name="CargoEntry" type="Marker3D" parent="InteractionMarkers"]
+position = Vector3(0.0, 0.0, 9.6)
+
+[node name="PassengerSeatMarkers" type="Node3D" parent="."]
+
+[node name="Passenger_01_Left" type="Marker3D" parent="PassengerSeatMarkers"]
+position = Vector3(-1.55, 1.05, -4.65)
+
+[node name="Passenger_01_Right" type="Marker3D" parent="PassengerSeatMarkers"]
+position = Vector3(1.55, 1.05, -4.65)
+
+[node name="Passenger_02_Left" type="Marker3D" parent="PassengerSeatMarkers"]
+position = Vector3(-1.55, 1.05, -2.4)
+
+[node name="Passenger_02_Right" type="Marker3D" parent="PassengerSeatMarkers"]
+position = Vector3(1.55, 1.05, -2.4)
+
+[node name="Passenger_03_Left" type="Marker3D" parent="PassengerSeatMarkers"]
+position = Vector3(-1.55, 1.05, -0.15)
+
+[node name="Passenger_03_Right" type="Marker3D" parent="PassengerSeatMarkers"]
+position = Vector3(1.55, 1.05, -0.15)
+
+[node name="Passenger_04_Left" type="Marker3D" parent="PassengerSeatMarkers"]
+position = Vector3(-1.55, 1.05, 2.1)
+
+[node name="Passenger_04_Right" type="Marker3D" parent="PassengerSeatMarkers"]
+position = Vector3(1.55, 1.05, 2.1)
+

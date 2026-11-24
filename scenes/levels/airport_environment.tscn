@@ -1,0 +1,220 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Mat_apron"]
+albedo_color = Color(0.3, 0.35, 0.4, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_cargo"]
+albedo_color = Color(0.68, 0.39, 0.15, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_dark"]
+albedo_color = Color(0.22, 0.27, 0.33, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_heavy_cargo"]
+albedo_color = Color(0.5, 0.3, 0.17, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_line"]
+albedo_color = Color(0.99, 0.74, 0.23, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_staging"]
+albedo_color = Color(0.13, 0.45, 0.65, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_terminal"]
+albedo_color = Color(0.61, 0.66, 0.71, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_G1"]
+size = Vector3(80.0, 0.34, 48.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G1"]
+size = Vector3(80.0, 0.34, 48.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G2"]
+size = Vector3(14.0, 4.0, 19.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G2"]
+size = Vector3(14.0, 4.0, 19.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G3"]
+size = Vector3(15.0, 0.3, 20.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G3"]
+size = Vector3(15.0, 0.3, 20.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G4"]
+size = Vector3(8.0, 0.025, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G4"]
+size = Vector3(8.0, 0.025, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G5"]
+size = Vector3(4.0, 0.025, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G5"]
+size = Vector3(4.0, 0.025, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G6"]
+size = Vector3(0.2, 0.025, 4.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G6"]
+size = Vector3(0.2, 0.025, 4.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G7"]
+size = Vector3(0.95, 0.92, 0.95)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G7"]
+size = Vector3(0.95, 0.92, 0.95)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G8"]
+size = Vector3(1.6, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G8"]
+size = Vector3(1.6, 1.2, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G9"]
+size = Vector3(5.0, 1.5, 5.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G9"]
+size = Vector3(5.0, 1.5, 5.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_G10"]
+size = Vector3(5.0, 0.04, 5.0)
+
+[sub_resource type="BoxShape3D" id="BoxShape_G10"]
+size = Vector3(5.0, 0.04, 5.0)
+
+[node name="AirportEnvironment" type="Node3D"]
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="AirportApron" type="StaticBody3D" parent="World"]
+position = Vector3(0.0, -0.17, 0.0)
+
+[node name="Visual" type="MeshInstance3D" parent="World/AirportApron"]
+mesh = SubResource("BoxMesh_G1")
+material_override = SubResource("Mat_apron")
+
+[node name="Collision" type="CollisionShape3D" parent="World/AirportApron"]
+shape = SubResource("BoxShape_G1")
+
+[node name="TerminalShell" type="StaticBody3D" parent="World"]
+position = Vector3(-28.0, 2.0, -8.0)
+
+[node name="Visual" type="MeshInstance3D" parent="World/TerminalShell"]
+mesh = SubResource("BoxMesh_G2")
+material_override = SubResource("Mat_terminal")
+
+[node name="Collision" type="CollisionShape3D" parent="World/TerminalShell"]
+shape = SubResource("BoxShape_G2")
+
+[node name="TerminalRoof" type="StaticBody3D" parent="World"]
+position = Vector3(-28.0, 4.2, -8.0)
+
+[node name="Visual" type="MeshInstance3D" parent="World/TerminalRoof"]
+mesh = SubResource("BoxMesh_G3")
+material_override = SubResource("Mat_dark")
+
+[node name="Collision" type="CollisionShape3D" parent="World/TerminalRoof"]
+shape = SubResource("BoxShape_G3")
+
+[node name="LoadingGuide01" type="Node3D" parent="World"]
+position = Vector3(-3.0, 0.013, 8.0)
+
+[node name="Visual" type="MeshInstance3D" parent="World/LoadingGuide01"]
+mesh = SubResource("BoxMesh_G4")
+material_override = SubResource("Mat_line")
+
+[node name="LoadingGuide02" type="Node3D" parent="World"]
+position = Vector3(3.0, 0.013, 8.0)
+
+[node name="Visual" type="MeshInstance3D" parent="World/LoadingGuide02"]
+mesh = SubResource("BoxMesh_G5")
+material_override = SubResource("Mat_line")
+
+[node name="LoadingGuide03" type="Node3D" parent="World"]
+position = Vector3(10.0, 0.013, 10.0)
+
+[node name="Visual" type="MeshInstance3D" parent="World/LoadingGuide03"]
+mesh = SubResource("BoxMesh_G6")
+material_override = SubResource("Mat_line")
+
+[node name="CargoProps" type="Node3D" parent="."]
+
+[node name="NormalCargo01" type="StaticBody3D" parent="CargoProps"]
+position = Vector3(-8.7, 0.46, 6.9)
+
+[node name="Visual" type="MeshInstance3D" parent="CargoProps/NormalCargo01"]
+mesh = SubResource("BoxMesh_G7")
+material_override = SubResource("Mat_cargo")
+
+[node name="Collision" type="CollisionShape3D" parent="CargoProps/NormalCargo01"]
+shape = SubResource("BoxShape_G7")
+
+[node name="NormalCargo02" type="StaticBody3D" parent="CargoProps"]
+position = Vector3(-7.1, 0.46, 8.7)
+
+[node name="Visual" type="MeshInstance3D" parent="CargoProps/NormalCargo02"]
+mesh = SubResource("BoxMesh_G7")
+material_override = SubResource("Mat_cargo")
+
+[node name="Collision" type="CollisionShape3D" parent="CargoProps/NormalCargo02"]
+shape = SubResource("BoxShape_G7")
+
+[node name="HeavyCargo01" type="StaticBody3D" parent="CargoProps"]
+position = Vector3(-8.6, 0.6, 10.2)
+
+[node name="Visual" type="MeshInstance3D" parent="CargoProps/HeavyCargo01"]
+mesh = SubResource("BoxMesh_G8")
+material_override = SubResource("Mat_heavy_cargo")
+
+[node name="Collision" type="CollisionShape3D" parent="CargoProps/HeavyCargo01"]
+shape = SubResource("BoxShape_G8")
+
+[node name="Zones" type="Node3D" parent="."]
+
+[node name="CargoPickupStagingZone" type="Area3D" parent="Zones" groups=["cargo_pickup_zone"]]
+position = Vector3(-8.0, 0.75, 8.5)
+
+[node name="Collision" type="CollisionShape3D" parent="Zones/CargoPickupStagingZone"]
+shape = SubResource("BoxShape_G9")
+
+[node name="VisiblePad" type="Node3D" parent="Zones/CargoPickupStagingZone"]
+position = Vector3(0.0, -0.715, 0.0)
+
+[node name="Visual" type="MeshInstance3D" parent="Zones/CargoPickupStagingZone/VisiblePad"]
+mesh = SubResource("BoxMesh_G10")
+material_override = SubResource("Mat_staging")
+
+[node name="PlayerSpawnMarkers" type="Node3D" parent="."]
+
+[node name="PlayerSpawn_01" type="Marker3D" parent="PlayerSpawnMarkers"]
+position = Vector3(-15.0, 0.0, 6.0)
+
+[node name="PlayerSpawn_02" type="Marker3D" parent="PlayerSpawnMarkers"]
+position = Vector3(-16.7, 0.0, 6.0)
+
+[node name="PlayerSpawn_03" type="Marker3D" parent="PlayerSpawnMarkers"]
+position = Vector3(-15.0, 0.0, 8.5)
+
+[node name="PlayerSpawn_04" type="Marker3D" parent="PlayerSpawnMarkers"]
+position = Vector3(-16.7, 0.0, 8.5)
+
+[node name="PathMarkers" type="Node3D" parent="."]
+
+[node name="CargoPickup" type="Marker3D" parent="PathMarkers"]
+position = Vector3(-8.0, 0.0, 8.5)
+
+[node name="ApronMidpoint" type="Marker3D" parent="PathMarkers"]
+position = Vector3(0.0, 0.0, 10.0)
+
+[node name="RearCargoEntry" type="Marker3D" parent="PathMarkers"]
+position = Vector3(10.0, 0.0, 9.0)
+
+[node name="PassengerBoarding" type="Marker3D" parent="PathMarkers"]
+position = Vector3(7.4, 0.0, 1.0)
+
