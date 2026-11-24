@@ -87,6 +87,28 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark"]
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 22.0
+content_margin_bottom = 10.0
+bg_color = Color(0.2, 0.24, 0.35, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark_hover"]
+content_margin_left = 22.0
+content_margin_top = 10.0
+content_margin_right = 22.0
+content_margin_bottom = 10.0
+bg_color = Color(0.27, 0.32, 0.45, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_quit"]
 
 [node name="TitleScreen" type="Control"]
@@ -136,7 +158,7 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.62, 0.68, 0.8, 1)
 theme_override_font_sizes/font_size = 15
-text = "Pick a name and take off"
+text = "Pick a name, then start a lobby or join one"
 horizontal_alignment = 1
 
 [node name="Gap" type="Control" parent="Center/Card/Box"]
@@ -160,15 +182,11 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_input_focus")
 placeholder_text = "Your name"
 max_length = 16
 
-[node name="Message" type="Label" parent="Center/Card/Box"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
+[node name="Gap2" type="Control" parent="Center/Card/Box"]
+custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.45, 0.4, 1)
-theme_override_font_sizes/font_size = 14
-autowrap_mode = 3
 
-[node name="PlayButton" type="Button" parent="Center/Card/Box"]
+[node name="CreateButton" type="Button" parent="Center/Card/Box"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.1, 0.08, 0.05, 1)
@@ -180,7 +198,54 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_play")
 theme_override_styles/hover = SubResource("StyleBoxFlat_play_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_play_pressed")
 theme_override_styles/focus = SubResource("StyleBoxFlat_play_hover")
-text = "Play"
+text = "Create lobby"
+
+[node name="OrLabel" type="Label" parent="Center/Card/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.68, 0.8, 1)
+theme_override_font_sizes/font_size = 13
+text = "or join a friend"
+horizontal_alignment = 1
+
+[node name="JoinRow" type="HBoxContainer" parent="Center/Card/Box"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="CodeInput" type="LineEdit" parent="Center/Card/Box/JoinRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.98, 0.66, 0.22, 1)
+theme_override_colors/font_placeholder_color = Color(0.5, 0.55, 0.65, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+theme_override_styles/focus = SubResource("StyleBoxFlat_input_focus")
+placeholder_text = "Lobby code"
+alignment = 1
+max_length = 5
+
+[node name="JoinButton" type="Button" parent="Center/Card/Box/JoinRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_dark")
+theme_override_styles/hover = SubResource("StyleBoxFlat_dark_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_dark")
+theme_override_styles/focus = SubResource("StyleBoxFlat_dark_hover")
+text = "Join"
+
+[node name="Message" type="Label" parent="Center/Card/Box"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.45, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="QuitButton" type="Button" parent="Center/Card/Box"]
 unique_name_in_owner = true
