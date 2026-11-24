@@ -10,6 +10,7 @@ const JUMP_VELOCITY = 4.5
 @export var just_landed: bool
 @export var velocity_proxy: Vector3 = Vector3.ZERO
 var username: String = "" # name from the title screen, set by the spawner before the player is added
+var speed_mul: float = 1.0 # walk speed scale, lowered by the cargo manager while carrying something heavy
 
 
 @onready var char_mesh = $CharacterMesh
@@ -71,8 +72,8 @@ func _physics_process(delta: float) -> void:
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	direction = -1 * direction # multiply by negative 1 because rig is flipped backwards
 	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+		velocity.x = direction.x * SPEED * speed_mul
+		velocity.z = direction.z * SPEED * speed_mul
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 		velocity.z = move_toward(velocity.z, 0, SPEED)
