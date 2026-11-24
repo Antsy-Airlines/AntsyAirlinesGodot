@@ -3,8 +3,8 @@ extends Control
 ## First screen of the game: the player types a username, then creates a lobby or joins one with a code.
 
 # Declaring Default/Const variables
-const LOBBY_SCENE := "res://scenes/lobby.tscn" # scene we go to once we have a lobby
-const DESK_SCENE := "res://scenes/front_desk.tscn" # scene the --server build runs
+const LOBBY_SCENE := "res://scenes/levels/lobby.tscn" # scene we go to once we have a lobby
+const DESK_SCENE := "res://scenes/network/front_desk.tscn" # scene the --server build runs
 const SAVE_PATH := "user://player.cfg" # file that remembers the username for next time
 const MAX_NAME_LEN := 16 # longest username allowed
 const ERROR_COLOR := Color(1, 0.45, 0.4) # red text for problems

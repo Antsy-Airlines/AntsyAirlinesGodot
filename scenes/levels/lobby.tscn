@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://55i3gkkvqg7w"]
 
-[ext_resource type="Script" uid="uid://ck4h6akr32dkx" path="res://scripts/lobby.gd" id="1_nqcc7"]
-[ext_resource type="Script" uid="uid://bw5434bbp0smc" path="res://scripts/high_level_player_spawner.gd" id="1_o1atq"]
-[ext_resource type="PackedScene" uid="uid://dmrcysj3x53c7" path="res://scenes/player.tscn" id="2_5gu6x"]
-[ext_resource type="PackedScene" path="res://scenes/lobby_hud.tscn" id="5_hud"]
+[ext_resource type="Script" uid="uid://ck4h6akr32dkx" path="res://scripts/levels/lobby.gd" id="1_nqcc7"]
+[ext_resource type="Script" uid="uid://bw5434bbp0smc" path="res://scripts/network/high_level_player_spawner.gd" id="1_o1atq"]
+[ext_resource type="PackedScene" uid="uid://dmrcysj3x53c7" path="res://scenes/player/player.tscn" id="2_5gu6x"]
+[ext_resource type="PackedScene" path="res://scenes/ui/lobby_hud.tscn" id="5_hud"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_dkdl3"]
 size = Vector3(18, 0.2, 18)
