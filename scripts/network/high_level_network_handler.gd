@@ -13,7 +13,7 @@ const DEFAULT_HOST: String = "localhost" # change to "localhost for local testin
 # !EC2 instance changes public api when you stop/start it
 
 # Declaring title screen variables
-const TITLE_SCENE: String = "res://scenes/title_screen.tscn" # where players go back to when the connection breaks
+const TITLE_SCENE: String = "res://scenes/ui/title_screen.tscn" # where players go back to when the connection breaks
 const CONNECT_TIMEOUT: float = 5.0 # seconds to wait for the server before giving up
 const KICK_DELAY: float = 2.0 # seconds before kicking a refused player, so the reason reaches them first
 
