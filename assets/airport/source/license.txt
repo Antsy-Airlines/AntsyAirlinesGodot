@@ -1,0 +1,8 @@
+Model Information:
+* title:	Airport Pack Total
+* source:	https://sketchfab.com/3d-models/airport-pack-total-ad40f27ecd5e492c8149cde6a5dd56d1
+* author:	assetfactory (https://sketchfab.com/assetfactory)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
