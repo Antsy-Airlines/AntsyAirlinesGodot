@@ -3,10 +3,19 @@ extends CharacterBody3D
 
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
+
+# State variables
 @export var on_floor: bool
+@export var on_floor_previous: bool
+@export var just_landed: bool
 @export var velocity_proxy: Vector3 = Vector3.ZERO
+
+
 @onready var char_mesh = $CharacterMesh
 @onready var animation_player = $AnimationPlayer
+@onready var footstep_sound = $FootstepPlayer3D
+@onready var jump_sound = $JumpPlayer3D
+@onready var land_sound = $LandPlayer3D
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
@@ -26,6 +35,13 @@ func _update_animation() -> void:
 	else:
 		animation_player.play("Idle")
 
+func _on_footstep() -> void:
+	if multiplayer.is_server():
+		return
+	# play footstep sound here
+	footstep_sound.play()
+	pass
+
 func _physics_process(delta: float) -> void:
 	# test playing animation
 	_update_animation()
@@ -40,6 +56,7 @@ func _physics_process(delta: float) -> void:
 	# Handle jump.
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
+		jump_sound.play()
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
@@ -55,4 +72,8 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	on_floor = is_on_floor()
+	just_landed = on_floor and not on_floor_previous
+	if just_landed:
+		land_sound.play()
+	on_floor_previous = on_floor
 	velocity_proxy = velocity	
