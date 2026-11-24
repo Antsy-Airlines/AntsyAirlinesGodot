@@ -1,5 +1,8 @@
 extends Node
 
+signal player_joined(id: int, user_name: String) # server: a player passed the name check
+signal player_left(id: int) # server: a player with a name left
+
 const PORT: int = 42069
 ## Fallback used when no --host arg and no ANTSY_HOST env var is present.
 ## Point this at your EC2 Elastic IP (or a domain pointing at it) before shipping builds.
@@ -9,10 +12,12 @@ const DEFAULT_HOST: String = "localhost" # change to "localhost for local testin
 # Declaring title screen variables
 const TITLE_SCENE: String = "res://scenes/title_screen.tscn" # where players go back to when the connection breaks
 const CONNECT_TIMEOUT: float = 5.0 # seconds to wait for the server before giving up
+const KICK_DELAY: float = 2.0 # seconds before kicking a refused player, so the reason reaches them first
 
 var peer: ENetMultiplayerPeer
 var username: String = "" # name typed on the title screen
 var last_error: String = "" # message the title screen shows after we get sent back
+var _names: Dictionary = {} # server only: peer id -> username
 
 
 func _ready() -> void:
@@ -75,9 +80,77 @@ func _on_peer_connected(id: int) -> void:
 func _on_peer_disconnected(id: int) -> void:
 	print("[server] peer %d disconnected" % id)
 
+	# if they never got a name, there is no player to remove
+	if not _names.has(id):
+		return
+	_names.erase(id)
+	player_left.emit(id)
+
 
 func _on_connected_to_server() -> void:
 	print("[client] connected, my id is %d" % multiplayer.get_unique_id())
+	_request_join.rpc_id(1, username) # asking the server to let us in with our name
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _request_join(user_name: String) -> void:
+	## This function runs on the server when a client sends its username
+	# user_name: the name the client typed on the title screen
+	var id = multiplayer.get_remote_sender_id()
+
+	# Guard case for a client that already joined
+	if _names.has(id):
+		return
+
+	# checking the name with the same rules as the title screen
+	var name_err = TitleScreen.check_name(user_name)
+	if name_err != "":
+		_refuse(id, name_err)
+		return
+
+	# giving the player a name nobody else has
+	var final_name = unique_name(user_name.strip_edges(), _names.values())
+	_names[id] = final_name
+	print("[server] peer %d joined as %s" % [id, final_name])
+	player_joined.emit(id, final_name)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _join_refused(reason: String) -> void:
+	## This function runs on the client when the server won't let it in
+	# reason: what to tell the player on the title screen
+	print("[client] join refused: %s" % reason)
+	_back_to_title(reason)
+
+
+func _refuse(id: int, reason: String) -> void:
+	## This function tells a client why it can't join, then kicks it
+	# id: the peer to refuse
+	# reason: message for that player
+	_join_refused.rpc_id(id, reason)
+
+	# kicking later so the reason arrives first
+	await get_tree().create_timer(KICK_DELAY).timeout
+	if multiplayer.get_peers().has(id):
+		multiplayer.multiplayer_peer.disconnect_peer(id)
+
+
+static func unique_name(wanted: String, taken: Array) -> String:
+	## This function adds " 2", " 3"... to a name until nobody else has it
+	# wanted: the checked name the player asked for
+	# taken: names already in the lobby
+
+	# comparing in lowercase so "aseel" and "Aseel" count as the same
+	var taken_lower = taken.map(func(n): return n.to_lower())
+	var final_name = wanted
+	var num = 2
+
+	while final_name.to_lower() in taken_lower:
+		var suffix = " %d" % num
+		final_name = wanted.left(TitleScreen.MAX_NAME_LEN - suffix.length()) + suffix # keeping it under the max length
+		num += 1
+
+	return final_name
 
 
 func _on_connection_failed() -> void:
