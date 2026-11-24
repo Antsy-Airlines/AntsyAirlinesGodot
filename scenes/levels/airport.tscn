@@ -39,6 +39,7 @@
 [ext_resource type="Script" path="res://scripts/gameplay/cargo_manager.gd" id="37_cargo"]
 [ext_resource type="PackedScene" path="res://scenes/props/cargo_crate.tscn" id="38_crate"]
 [ext_resource type="PackedScene" path="res://scenes/ui/cargo_hud.tscn" id="39_cargo_hud"]
+[ext_resource type="PackedScene" path="res://scenes/props/heavy_crate.tscn" id="40_heavy"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.32, 0.52, 0.82, 1)
@@ -440,6 +441,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.6, 0.42, -12.6)
 
 [node name="Crate6" parent="Cargo/Crates" instance=ExtResource("38_crate")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.6, 0.42, -11.2)
+
+[node name="HeavyCrate1" parent="Cargo/Crates" instance=ExtResource("40_heavy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91.4, 0.42, -13.6)
+
+[node name="HeavyCrate2" parent="Cargo/Crates" instance=ExtResource("40_heavy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91.4, 0.42, -11.2)
 
 [node name="HoldZone" type="Node3D" parent="Cargo"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37, 0.02, -35)
