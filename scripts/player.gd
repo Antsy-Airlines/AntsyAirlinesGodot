@@ -9,6 +9,7 @@ const JUMP_VELOCITY = 4.5
 @export var on_floor_previous: bool
 @export var just_landed: bool
 @export var velocity_proxy: Vector3 = Vector3.ZERO
+var username: String = "" # name from the title screen, set by the spawner before the player is added
 
 
 @onready var char_mesh = $CharacterMesh
@@ -16,9 +17,15 @@ const JUMP_VELOCITY = 4.5
 @onready var footstep_sound = $FootstepPlayer3D
 @onready var jump_sound = $JumpPlayer3D
 @onready var land_sound = $LandPlayer3D
+@onready var name_tag: Label3D = $NameTag # floating name above the player
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	name_tag.text = username
+	name_tag.visible = !is_multiplayer_authority() # hiding our own tag, others still see it
 
 func _update_animation() -> void:
 	if not on_floor:
