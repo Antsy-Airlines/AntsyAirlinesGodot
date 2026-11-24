@@ -36,6 +36,9 @@
 [ext_resource type="PackedScene" path="res://assets/airport/pieces/ticket_machine.scn" id="34_ticket_machine"]
 [ext_resource type="PackedScene" path="res://assets/airport/pieces/trash_can.scn" id="35_trash_can"]
 [ext_resource type="PackedScene" path="res://scenes/props/sliding_door.tscn" id="36_sliding_door"]
+[ext_resource type="Script" path="res://scripts/gameplay/cargo_manager.gd" id="37_cargo"]
+[ext_resource type="PackedScene" path="res://scenes/props/cargo_crate.tscn" id="38_crate"]
+[ext_resource type="PackedScene" path="res://scenes/ui/cargo_hud.tscn" id="39_cargo_hud"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.32, 0.52, 0.82, 1)
@@ -81,6 +84,14 @@ size = Vector3(4.023, 0.3, 8.3)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ramp"]
 size = Vector3(4.023, 0.3, 8.3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hold"]
+albedo_color = Color(0.98, 0.58, 0.16, 1)
+roughness = 1.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_hold"]
+material = SubResource("StandardMaterial3D_hold")
+size = Vector2(6, 5)
 
 [node name="Airport" type="Node3D"]
 script = ExtResource("1_airport")
@@ -406,3 +417,43 @@ transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -89.5, 0.6, -28)
 
 [node name="Spawn8" type="Marker3D" parent="SpawnPoints"]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -89.5, 0.6, -25.5)
+
+[node name="Cargo" type="Node3D" parent="."]
+script = ExtResource("37_cargo")
+
+[node name="Crates" type="Node3D" parent="Cargo"]
+
+[node name="Crate1" parent="Cargo/Crates" instance=ExtResource("38_crate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -97, 0.42, -14)
+
+[node name="Crate2" parent="Cargo/Crates" instance=ExtResource("38_crate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -97, 0.42, -12.6)
+
+[node name="Crate3" parent="Cargo/Crates" instance=ExtResource("38_crate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -97, 0.42, -11.2)
+
+[node name="Crate4" parent="Cargo/Crates" instance=ExtResource("38_crate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.6, 0.42, -14)
+
+[node name="Crate5" parent="Cargo/Crates" instance=ExtResource("38_crate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.6, 0.42, -12.6)
+
+[node name="Crate6" parent="Cargo/Crates" instance=ExtResource("38_crate")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -95.6, 0.42, -11.2)
+
+[node name="HoldZone" type="Node3D" parent="Cargo"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37, 0.02, -35)
+
+[node name="Pad" type="MeshInstance3D" parent="Cargo/HoldZone"]
+mesh = SubResource("PlaneMesh_hold")
+
+[node name="Sign" type="Label3D" parent="Cargo/HoldZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
+billboard = 1
+modulate = Color(0.98, 0.66, 0.22, 1)
+outline_size = 14
+font_size = 96
+pixel_size = 0.01
+text = "CARGO HOLD"
+
+[node name="CargoHud" parent="Cargo" instance=ExtResource("39_cargo_hud")]
