@@ -19,7 +19,7 @@ const KICK_DELAY: float = 2.0 # seconds before kicking a refused player, so the 
 
 # Declaring lobby room variables
 const MAX_PLAYERS: int = 4 # most players allowed in one lobby (the game is for 2-4 friends)
-const MIN_PLAYERS: int = 2 # players needed before the host can start
+const MIN_PLAYERS: int = 1 # players needed before the host can start (1 so the host can also play alone)
 const EMPTY_TIMEOUT: float = 60.0 # seconds a room can stay empty before it shuts down
 const GAME_VERSION: int = 1 # raise this when servers and players must update together
 const STATUS_TIME: float = 2.0 # seconds between a room's ALIVE reports to the front desk
