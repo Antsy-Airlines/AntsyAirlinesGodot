@@ -1,0 +1,204 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/lobby_hud.gd" id="1_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_corner"]
+content_margin_left = 18.0
+content_margin_top = 12.0
+content_margin_right = 18.0
+content_margin_bottom = 12.0
+bg_color = Color(0.07, 0.09, 0.15, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.08)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+content_margin_left = 36.0
+content_margin_top = 28.0
+content_margin_right = 36.0
+content_margin_bottom = 28.0
+bg_color = Color(0.07, 0.09, 0.15, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.08)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_orange"]
+content_margin_top = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.98, 0.66, 0.22, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_orange_hover"]
+content_margin_top = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 0.76, 0.38, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark"]
+content_margin_top = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.14, 0.17, 0.26, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark_hover"]
+content_margin_top = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.2, 0.24, 0.35, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_flat"]
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+
+[node name="LobbyHud" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="CodePanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -196.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 104.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_corner")
+
+[node name="CodeBox" type="VBoxContainer" parent="CodePanel"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="CodeTitle" type="Label" parent="CodePanel/CodeBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.68, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+text = "LOBBY CODE"
+horizontal_alignment = 1
+
+[node name="CodeLabel" type="Label" parent="CodePanel/CodeBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.66, 0.22, 1)
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+
+[node name="CodeHint" type="Label" parent="CodePanel/CodeBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.68, 0.8, 1)
+theme_override_font_sizes/font_size = 11
+text = "Esc to copy or leave"
+horizontal_alignment = 1
+
+[node name="Menu" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="Menu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Center" type="CenterContainer" parent="Menu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="PanelContainer" parent="Menu/Center"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="Box" type="VBoxContainer" parent="Menu/Center/Card"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="MenuTitle" type="Label" parent="Menu/Center/Card/Box"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.86, 1)
+theme_override_font_sizes/font_size = 30
+text = "Lobby"
+horizontal_alignment = 1
+
+[node name="MenuCode" type="Label" parent="Menu/Center/Card/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.66, 0.22, 1)
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+
+[node name="CopyButton" type="Button" parent="Menu/Center/Card/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleBoxFlat_dark")
+theme_override_styles/hover = SubResource("StyleBoxFlat_dark_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_dark")
+theme_override_styles/focus = SubResource("StyleBoxFlat_dark_hover")
+text = "Copy code"
+
+[node name="BackButton" type="Button" parent="Menu/Center/Card/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.08, 0.05, 1)
+theme_override_colors/font_hover_color = Color(0.1, 0.08, 0.05, 1)
+theme_override_colors/font_pressed_color = Color(0.1, 0.08, 0.05, 1)
+theme_override_colors/font_focus_color = Color(0.1, 0.08, 0.05, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_orange")
+theme_override_styles/hover = SubResource("StyleBoxFlat_orange_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_orange")
+theme_override_styles/focus = SubResource("StyleBoxFlat_orange_hover")
+text = "Back to game"
+
+[node name="LeaveButton" type="Button" parent="Menu/Center/Card/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.45, 0.4, 1)
+theme_override_colors/font_hover_color = Color(1, 0.62, 0.58, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxEmpty_flat")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_flat")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_flat")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_flat")
+text = "Leave lobby"

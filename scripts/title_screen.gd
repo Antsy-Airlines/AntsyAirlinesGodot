@@ -17,7 +17,7 @@ const MAX_NAME_LEN := 16 # longest username allowed
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# the server has no screen, so it goes straight to the lobby
-	if "--server" in OS.get_cmdline_args():
+	if HighLevelNetworkHandler.is_server_launch():
 		get_tree().change_scene_to_file.call_deferred(LOBBY_SCENE)
 		return
 
