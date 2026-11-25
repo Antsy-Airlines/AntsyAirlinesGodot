@@ -102,7 +102,12 @@ func _hint_for(me: Node3D) -> String:
 @rpc("any_peer", "call_local", "reliable")
 func _request_interact() -> void:
 	## This function runs on the server when a player presses E
-	var id = _sender_id()
+	interact(_sender_id())
+
+
+func interact(id: int) -> void:
+	## This function does what pressing E means for one player: pick up, grab, help lift, let go or put down (server only)
+	# id: the player who pressed E
 	var player = _player(id)
 
 	# Guard case for a player the server doesn't know
@@ -343,7 +348,11 @@ func _emit_count() -> void:
 func _player(id: int) -> Node3D:
 	## This function finds a player by peer id (players are named by their id)
 	# id: the peer
-	return get_tree().current_scene.get_node_or_null(str(id))
+	# Guard case for no current scene (the map loaded by a tool or test, not by the game)
+	var scene = get_tree().current_scene
+	if scene == null:
+		return null
+	return scene.get_node_or_null(str(id))
 
 
 func _sender_id() -> int:
