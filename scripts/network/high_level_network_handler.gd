@@ -37,6 +37,7 @@ var _names: Dictionary = {} # server only: peer id -> username
 var _slots: Dictionary = {} # server only: peer id -> spawn slot
 var _is_room: bool = false # server only: started with --room, so it closes when empty
 var _time_empty: float = 0.0 # server only: how long the room has had nobody in it
+var _empty_limit: float = EMPTY_TIMEOUT # room only: seconds empty before closing (--empty-timeout=<seconds> changes it, for tests)
 var _status_udp: PacketPeerUDP # room only: sends READY / ALIVE to the front desk
 var _time_status: float = 0.0 # room only: time since the last ALIVE report
 
@@ -69,8 +70,8 @@ func _process(delta: float) -> void:
 		return
 	_time_empty += delta
 
-	if _time_empty >= EMPTY_TIMEOUT:
-		print("[room %s] empty for %.0f s, shutting down" % [room_code, EMPTY_TIMEOUT])
+	if _time_empty >= _empty_limit:
+		print("[room %s] empty for %.0f s, shutting down" % [room_code, _empty_limit])
 		get_tree().quit()
 
 
@@ -92,9 +93,14 @@ func start_server() -> void:
 	if _is_room:
 		print("[room %s] waiting for players (max %d)" % [room_code, MAX_PLAYERS])
 
+		# a shorter empty timeout, if one was given
+		var limit_arg = get_arg("--empty-timeout=")
+		if limit_arg.is_valid_float():
+			_empty_limit = limit_arg.to_float()
+
 		# telling the front desk this room is listening
 		_status_udp = PacketPeerUDP.new()
-		_status_udp.set_dest_address("127.0.0.1", LobbyDirectory.STATUS_PORT)
+		_status_udp.set_dest_address("127.0.0.1", LobbyDirectory.status_port())
 		_send_status("READY")
 
 

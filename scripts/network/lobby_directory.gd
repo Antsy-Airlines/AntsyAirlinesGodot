@@ -67,9 +67,21 @@ func _exit_tree() -> void:
 
 # ---------------- front desk ----------------
 
+func desk_port() -> int:
+	## This function gives the front desk's port: --desk-port=<number> if given (tests), else the normal PORT
+	var port_arg = HighLevelNetworkHandler.get_arg("--desk-port=")
+	return port_arg.to_int() if port_arg.is_valid_int() else HighLevelNetworkHandler.PORT
+
+
+func status_port() -> int:
+	## This function gives the port rooms report to: --status-port=<number> if given (tests), else STATUS_PORT
+	var port_arg = HighLevelNetworkHandler.get_arg("--status-port=")
+	return port_arg.to_int() if port_arg.is_valid_int() else STATUS_PORT
+
+
 func start_desk() -> void:
 	## This function turns this game into the front desk that hands out lobby codes
-	var port = HighLevelNetworkHandler.PORT
+	var port = desk_port()
 	_peer = ENetMultiplayerPeer.new()
 	var err = _peer.create_server(port)
 	if err != OK:
@@ -80,7 +92,7 @@ func start_desk() -> void:
 
 	# listening for room reports from this computer only
 	_status_udp = PacketPeerUDP.new()
-	_status_udp.bind(STATUS_PORT, "127.0.0.1")
+	_status_udp.bind(status_port(), "127.0.0.1")
 
 	_is_desk = true
 	print("[desk] front desk listening on UDP port %d (rooms on %d-%d)" % [port, FIRST_ROOM_PORT, FIRST_ROOM_PORT + ROOM_COUNT - 1])
@@ -124,7 +136,7 @@ func _create_room(id: int) -> void:
 	var args = []
 	if not OS.has_feature("template"): # running from the editor, so pointing at the project folder
 		args += ["--path", ProjectSettings.globalize_path("res://")]
-	args += ["--headless", "--room", "--port=%d" % port, "--code=%s" % code]
+	args += ["--headless", "--room", "--port=%d" % port, "--code=%s" % code, "--status-port=%d" % status_port()]
 	var pid = OS.create_process(OS.get_executable_path(), args)
 
 	# if the room process didn't start at all
@@ -270,7 +282,7 @@ func _ask_desk(action: String, code: String) -> void:
 	# connecting to the front desk with our own connection
 	var host = HighLevelNetworkHandler.get_host()
 	_peer = ENetMultiplayerPeer.new()
-	if _peer.create_client(host, HighLevelNetworkHandler.PORT) != OK:
+	if _peer.create_client(host, desk_port()) != OK:
 		_finish_fail("Can't reach the server.")
 		return
 	_api.multiplayer_peer = _peer

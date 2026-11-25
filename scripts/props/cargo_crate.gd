@@ -14,10 +14,16 @@ const SOLID_LAYER := 1 # physics layer the crate is on while it sits on the grou
 var holder_id: int = 0 # peer carrying it, or the first to grab a heavy crate (0 = nobody)
 var helper_id: int = 0 # heavy crates: the second player carrying it (0 = nobody)
 var loaded: bool = false # true once it is in the plane's hold
+var settling: bool = false # just put down on top of a player: stays see-through until they step off
 
 
 # Called every physics frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(_delta: float) -> void:
+	# turning solid again once nobody stands inside a crate that was just put down
+	if settling and not _touches_player():
+		settling = false
+		collision_layer = SOLID_LAYER
+
 	# Guard case for a crate still on the ground
 	if not is_lifted():
 		return
@@ -57,8 +63,12 @@ func set_holders(id: int, help_id: int = 0) -> void:
 	holder_id = id
 	helper_id = help_id
 
-	# a lifted crate stops being solid, so it doesn't push its carriers around
-	collision_layer = 0 if is_lifted() else SOLID_LAYER
+	# a lifted crate is no longer settling anywhere
+	if is_lifted():
+		settling = false
+
+	# a lifted (or settling) crate stops being solid, so it doesn't push its carriers around
+	collision_layer = 0 if is_lifted() or settling else SOLID_LAYER
 
 
 func place(spot: Transform3D) -> void:
@@ -67,8 +77,31 @@ func place(spot: Transform3D) -> void:
 	set_holders(0, 0)
 	global_transform = spot
 
+	# staying see-through until we know nobody stands where it landed (checked next physics frame)
+	settling = true
+	collision_layer = 0
+
+
+func _touches_player() -> bool:
+	## This function says if any player stands inside the crate right now
+	var query = PhysicsShapeQueryParameters3D.new()
+	query.shape = $Shape.shape
+	query.transform = $Shape.global_transform
+	query.collision_mask = SOLID_LAYER
+	query.exclude = [get_rid()]
+
+	# checking everything the crate overlaps for a player
+	for hit in get_world_3d().direct_space_state.intersect_shape(query, 16):
+		if hit.collider is CharacterBody3D:
+			return true
+	return false
+
 
 func _find(id: int) -> Node3D:
 	## This function finds a player by peer id (players are named by their id)
 	# id: the peer
-	return get_tree().current_scene.get_node_or_null(str(id))
+	# Guard case for no current scene (the map loaded by a tool or test, not by the game)
+	var scene = get_tree().current_scene
+	if scene == null:
+		return null
+	return scene.get_node_or_null(str(id))
