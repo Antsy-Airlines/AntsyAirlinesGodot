@@ -6,23 +6,37 @@ const DeskScript := preload("res://scripts/network/lobby_directory.gd") # make_c
 
 # Declaring tracking variables
 var _saved_rooms: Dictionary # the rooms in the autoload before each test, put back after
+var _pids: Array = [] # stand-in room processes started by the current test
 
 
 func before_test() -> void:
 	# working on an empty room list, so tests do not depend on each other
 	_saved_rooms = LobbyDirectory._rooms
 	LobbyDirectory._rooms = {}
+	_pids = []
 
 
 func after_test() -> void:
 	LobbyDirectory._rooms = _saved_rooms
+	for pid in _pids:
+		if OS.is_process_running(pid):
+			OS.kill(pid)
+
+
+func _stand_in() -> int:
+	## This function starts a headless copy of the game to stand in for a room process, and gives its id
+	## (on Linux Godot can only tell if its own child processes are running, so the test itself cannot stand in)
+	var pid = OS.create_process(OS.get_executable_path(), ["--headless", "--path", ProjectSettings.globalize_path("res://"), "--quit-after", "3000"])
+	assert_int(pid).is_greater(0)
+	_pids.append(pid)
+	return pid
 
 
 func _room(port: int, ready: bool = true, pid: int = OS.get_process_id()) -> Dictionary:
 	## This function makes a fake room entry like the front desk keeps
 	# port: port of the room
 	# ready: if the room already said READY
-	# pid: process of the room (defaults to this test, which is running)
+	# pid: process of the room (defaults to this test, fine when _check_rooms is not called)
 	return {"port": port, "pid": pid, "players": 0, "ready": ready, "last_seen": Time.get_ticks_msec(), "waiting": []}
 
 
@@ -87,7 +101,7 @@ func test_room_report_ignores_junk_and_unknown_rooms() -> void:
 func test_check_rooms_forgets_closed_and_silent_rooms() -> void:
 	# a room whose process is gone, and a healthy one
 	LobbyDirectory._rooms["GONEE"] = _room(42070, true, 999999)
-	LobbyDirectory._rooms["FINEE"] = _room(42072)
+	LobbyDirectory._rooms["FINEE"] = _room(42072, true, _stand_in())
 
 	LobbyDirectory._check_rooms()
 	assert_array(LobbyDirectory._rooms.keys()).contains_exactly(["FINEE"])
@@ -95,8 +109,7 @@ func test_check_rooms_forgets_closed_and_silent_rooms() -> void:
 
 func test_check_rooms_stops_a_room_that_went_quiet() -> void:
 	# a stand-in room process that would run for a while on its own
-	var pid = OS.create_process(OS.get_executable_path(), ["--headless", "--path", ProjectSettings.globalize_path("res://"), "--quit-after", "3000"])
-	assert_int(pid).is_greater(0)
+	var pid = _stand_in()
 	var quiet = _room(42071, true, pid)
 	quiet["last_seen"] = Time.get_ticks_msec() - int(DeskScript.SILENT_TIMEOUT * 1000) - 1000
 	LobbyDirectory._rooms["QUIET"] = quiet
@@ -109,7 +122,7 @@ func test_check_rooms_stops_a_room_that_went_quiet() -> void:
 
 func test_check_rooms_gives_new_rooms_time_to_start() -> void:
 	# a room that has not said READY yet is kept until START_TIMEOUT
-	LobbyDirectory._rooms["NEWWW"] = _room(42070, false)
+	LobbyDirectory._rooms["NEWWW"] = _room(42070, false, _stand_in())
 	LobbyDirectory._check_rooms()
 	assert_bool(LobbyDirectory._rooms.has("NEWWW")).is_true()
 
