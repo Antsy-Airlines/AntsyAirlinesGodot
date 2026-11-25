@@ -3,3 +3,7 @@
 /android/
 antsy-airlines-key.pem
 exports/
+
+# gdUnit4 test results and the editor's last test run
+reports/
+addons/gdUnit4/GdUnitRunner.cfg

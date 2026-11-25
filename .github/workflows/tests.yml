@@ -1,0 +1,60 @@
+# Runs every gdUnit4 test in test/ on each pull request and each push to main.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# a newer push to the same branch cancels the older run
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GODOT_VERSION: 4.7.2
+      GODOT: ${{ github.workspace }}/../godot/godot
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # keeping the Godot download between runs
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/../godot
+          key: godot-${{ env.GODOT_VERSION }}-linux
+
+      - name: Download Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ../godot
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip -d ../godot
+          mv "../godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" ../godot/godot
+          chmod +x ../godot/godot
+          rm godot.zip
+
+      # importing makes the .godot cache (class names, imported models) the tests need
+      - name: Import project
+        run: $GODOT --headless --path . --import
+
+      # --remote-debug to port 0 stops Godot from waiting at a debug prompt if a script breaks
+      # -c keeps going after a failure, so one run shows every broken test
+      - name: Run tests
+        run: $GODOT --headless --path . -s -d --remote-debug tcp://127.0.0.1:0 res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode -c -a res://test
+
+      # the gdUnit report, plus the logs of every server and bot from the network tests
+      - name: Upload test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: |
+            reports/
+            ~/.local/share/godot/app_userdata/Antsy Airlines/net_tests/
