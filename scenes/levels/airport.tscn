@@ -37,8 +37,8 @@
 [ext_resource type="PackedScene" path="res://scenes/props/sliding_door.tscn" id="36_sliding_door"]
 [ext_resource type="Script" uid="uid://6tlyuq8f1ju" path="res://scripts/gameplay/cargo_manager.gd" id="37_cargo"]
 [ext_resource type="PackedScene" path="res://scenes/props/cargo_crate.tscn" id="38_crate"]
+[ext_resource type="PackedScene" uid="uid://btwconmeb2lpc" path="res://assets/airplane-antsy-airlines.glb" id="38_irrxr"]
 [ext_resource type="PackedScene" path="res://scenes/ui/cargo_hud.tscn" id="39_cargo_hud"]
-[ext_resource type="PackedScene" uid="uid://ex5h8kq02cut" path="res://assets/airplane_mvp.glb" id="40_h800k"]
 [ext_resource type="PackedScene" path="res://scenes/props/heavy_crate.tscn" id="40_heavy"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
@@ -145,10 +145,10 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -21.2, 0, 111.78)
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -13.5, 0, 38.36)
 
 [node name="Airplane3" parent="Planes" unique_id=1254175775 instance=ExtResource("6_airplane_3")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -19.9, 0, -25.58)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -26.645407, 0, -124.51323)
 
 [node name="Airplane4" parent="Planes" unique_id=468633172 instance=ExtResource("7_airplane_4")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -41.8, 0, -93.57)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -41.8, 0, -72.81842)
 
 [node name="JetBridge" parent="Planes" unique_id=661024827 instance=ExtResource("23_jet_bridge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -49.6, 0, -21.9)
@@ -445,7 +445,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91.4, 0.42, -13.6)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91.4, 0.42, -11.2)
 
 [node name="HoldZone" type="Node3D" parent="Cargo" unique_id=450855675]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37, 0.02, -35)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -58.392452, 0.02, -41.318787)
 
 [node name="Pad" type="MeshInstance3D" parent="Cargo/HoldZone" unique_id=1761680039]
 mesh = SubResource("PlaneMesh_hold")
@@ -461,5 +461,25 @@ outline_size = 14
 
 [node name="CargoHud" parent="Cargo" unique_id=1770116718 instance=ExtResource("39_cargo_hud")]
 
-[node name="airplane_mvp" parent="." unique_id=932656560 instance=ExtResource("40_h800k")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50.917984, 4.217499, -48.875267)
+[node name="airplane-antsy-airlines" parent="." unique_id=1925967127 instance=ExtResource("38_irrxr")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -33.017433, 3.3974724, -41.03058)
+
+[node name="Backdoor" parent="airplane-antsy-airlines" index="0" unique_id=1432222298]
+transform = Transform3D(1, 3.3712766e-08, -4.2552475e-08, -4.255247e-08, 0.9734872, -0.22874175, 3.371277e-08, 0.22874175, 0.9734872, 0, -0.58615255, -18.360912)
+
+[node name="character" parent="airplane-antsy-airlines" index="3" unique_id=469956099]
+transform = Transform3D(0.5158369, 0, 0, 0, 0.5158369, 0, 0, 0, 0.5158369, -4.364071, -2.3952143, -2.8702126)
+
+[node name="FrontDoor_L" parent="airplane-antsy-airlines" index="9" unique_id=2037097328]
+transform = Transform3D(0.6024982, 0, -0.79812026, 0, 1, 0, 0.79812026, 0, 0.6024982, 2.4120026, 0.58465624, 6.396577)
+
+[node name="FrontDoor_R" parent="airplane-antsy-airlines" index="10" unique_id=2106270720]
+transform = Transform3D(0.49218774, 0, 0.87048906, 0, 1, 0, -0.87048906, 0, 0.49218774, -2.4120026, 0.58465624, 6.3965764)
+
+[node name="WingDoor_L_001" parent="airplane-antsy-airlines" index="28" unique_id=1247230535]
+transform = Transform3D(0.4901524, 0, -0.87163675, 0, 1, 0, 0.87163675, 0, 0.4901524, 2.4120026, 0.58465624, -4.046178)
+
+[node name="WingDoor_R_001" parent="airplane-antsy-airlines" index="29" unique_id=1608708574]
+transform = Transform3D(0.50778425, 0, 0.8614843, 0, 1, 0, -0.8614843, 0, 0.50778425, -2.4120026, 0.58465624, -4.046178)
+
+[editable path="airplane-antsy-airlines"]
