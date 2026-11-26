@@ -482,4 +482,7 @@ transform = Transform3D(0.4901524, 0, -0.87163675, 0, 1, 0, 0.87163675, 0, 0.490
 [node name="WingDoor_R_001" parent="airplane-antsy-airlines" index="29" unique_id=1608708574]
 transform = Transform3D(0.50778425, 0, 0.8614843, 0, 1, 0, -0.8614843, 0, 0.50778425, -2.4120026, 0.58465624, -4.046178)
 
+[node name="airplane-antsy-airlines2" parent="." unique_id=1115548033 instance=ExtResource("38_irrxr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.212389, 3.3974724, -69.663284)
+
 [editable path="airplane-antsy-airlines"]
