@@ -1,16 +1,16 @@
 class_name PlaneDoor
 extends Interactable
-## A hinged plane door players open and close with E. The door swings about its hinge (its own origin) and
-## the handle turns about its own axis while it swings, then settles back.
+## A hinged plane door players open and close with E: the side doors, and the cargo ramp at the back.
+## The door swings about its hinge (its own origin); if it has a handle, the handle turns about its own axis
+## while it swings, then settles back.
 ## The server decides open or closed; every computer plays the swing itself, so only one bool goes over the network.
 ## Rotations are local, so the door keeps working while the fuselage it hangs on moves.
 
 # Declaring Default/Const variables
-const OPEN_PROMPT := "Press E to open the door"
-const CLOSE_PROMPT := "Press E to close the door"
-
 @export var door: Node3D # the door mesh, with its origin on the hinge
-@export var handle: Node3D # the handle mesh under the door
+@export var handle: Node3D # the handle mesh under the door (optional: the cargo ramp has none)
+@export var open_prompt: String = "Press E to open the door" # E hint while closed
+@export var close_prompt: String = "Press E to close the door" # E hint while open
 @export var open_angle_deg: float = 90.0 # how far it swings, signed so it opens outward
 @export var hinge_axis: Vector3 = Vector3.UP # hinge direction in the door's own space
 @export var handle_axis: Vector3 = Vector3.RIGHT # turning axis in the handle's own space
@@ -22,6 +22,7 @@ var is_open: bool = false # what the server last said
 var _amount: float = 0.0 # 0 = closed, 1 = open (the swing plays this)
 var _door_closed: Quaternion # door rotation when closed
 var _handle_closed: Quaternion # handle rotation when closed
+var _reach_point: Vector3 # where players reach for, in the door's space (the handle, or the door's middle)
 var _tween: Tween # the swing that is playing, if any
 
 
@@ -29,7 +30,11 @@ var _tween: Tween # the swing that is playing, if any
 func _ready() -> void:
 	# remembering the closed pose; rotations go through quaternions so mesh scale is never touched
 	_door_closed = door.quaternion
-	_handle_closed = handle.quaternion
+	if handle != null:
+		_handle_closed = handle.quaternion
+		_reach_point = door.to_local(handle.global_position)
+	elif door is MeshInstance3D:
+		_reach_point = door.mesh.get_aabb().get_center()
 
 	# a computer that joins late asks whether the door is already open
 	if not multiplayer.is_server():
@@ -39,13 +44,13 @@ func _ready() -> void:
 func get_prompt(_player: Node3D) -> String:
 	## This function says what pressing E would do (see Interactable)
 	# _player: the player asking
-	return CLOSE_PROMPT if is_open else OPEN_PROMPT
+	return close_prompt if is_open else open_prompt
 
 
 func get_distance(player: Node3D) -> float:
-	## This function measures to the handle, so the door works from inside and outside (see Interactable)
+	## This function measures to the handle (or the door's middle), so it works from inside and outside (see Interactable)
 	# player: the player asking
-	return handle.global_position.distance_to(player.global_position)
+	return door.to_global(_reach_point).distance_to(player.global_position)
 
 
 func interact(_id: int) -> void:
@@ -76,6 +81,10 @@ func _pose(amount: float) -> void:
 	# amount: 0 = closed, 1 = open
 	_amount = amount
 	door.quaternion = _door_closed * Quaternion(hinge_axis.normalized(), deg_to_rad(open_angle_deg) * amount)
+
+	# Guard case for a door without a handle
+	if handle == null:
+		return
 
 	# the handle turns as the door unlatches and settles back as it finishes
 	var turn = deg_to_rad(handle_angle_deg) * sin(PI * amount)

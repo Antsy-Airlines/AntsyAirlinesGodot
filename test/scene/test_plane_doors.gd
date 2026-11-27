@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
 ## Plane doors without a network: the E hint, opening outward about the hinge, the handle turning on its own axis
-## (and keeping its scale), closing again, and the Interactor picking the nearest thing to use.
+## (and keeping its scale), closing again, the cargo ramp lowering to the ground, and the Interactor picking the nearest thing.
 
 # Getting References for the helpers
 const TestWorld := preload("res://test/helpers/test_world.gd") # current scene, no airport
@@ -9,6 +9,8 @@ const PLANE_SCENE := preload("res://scenes/Plane.tscn") # the plane with its doo
 # Declaring Default/Const variables
 const DOORS := ["FrontDoorL", "FrontDoorR", "WingDoorL", "WingDoorR"]
 const DOOR_WIDTH := 2.0 # metres from the hinge to the far edge (along the door's -z)
+const GROUND_Y := -3.4 # plane space: the bottom of the landing gear wheels
+const RAMP_TIP := Vector3(0, -3.54, -2.96) # cargo ramp space: the end away from the hinge
 
 # Declaring tracking variables
 var _world # fresh world for each test
@@ -50,7 +52,7 @@ func test_hint_only_in_reach() -> void:
 	var door = _door("FrontDoorL")
 	var me = _world.add_player(1, _beside(door, 1.0))
 	await await_millis(50)
-	assert_str(me.get_node("Interactor").prompt).is_equal(PlaneDoor.OPEN_PROMPT)
+	assert_str(me.get_node("Interactor").prompt).is_equal(door.open_prompt)
 
 	_world.place(me, _beside(door, 6.0))
 	await await_millis(50)
@@ -125,3 +127,20 @@ func test_nearest_door_wins() -> void:
 	var me = _world.add_player(1, spot)
 	await await_millis(50)
 	assert_object(me.get_node("Interactor").target).is_same(wing)
+
+
+func test_cargo_ramp_lowers_to_the_ground_and_back() -> void:
+	var ramp = _door("CargoDoor")
+	assert_object(ramp.handle).is_null() # the ramp has no handle, the same script copes without one
+	var tip_closed = _plane.to_local(ramp.door.to_global(RAMP_TIP))
+
+	ramp.interact(1)
+	await await_millis(int(ramp.open_time * 1000) + 150)
+	var tip_open = _plane.to_local(ramp.door.to_global(RAMP_TIP))
+	assert_float(tip_open.y).is_between(GROUND_Y - 0.05, GROUND_Y + 0.3) # resting just on the ground
+	assert_float(tip_open.z).is_less(tip_closed.z) # still out behind the plane
+	assert_str(ramp.get_prompt(null)).is_equal(ramp.close_prompt)
+
+	ramp.interact(1)
+	await await_millis(int(ramp.open_time * 1000) + 150)
+	assert_vector(_plane.to_local(ramp.door.to_global(RAMP_TIP))).is_equal_approx(tip_closed, Vector3.ONE * 0.01)

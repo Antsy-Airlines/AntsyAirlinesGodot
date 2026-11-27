@@ -462,10 +462,4 @@ outline_size = 14
 [node name="CargoHud" parent="Cargo" unique_id=1770116718 instance=ExtResource("39_cargo_hud")]
 
 [node name="Plane" parent="." unique_id=1166477692 instance=ExtResource("40_h800k")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.551237, 3.3974717, -12.667048)
-
-[node name="CargoDoor" parent="Plane/antsy-airplane/Fuselage" parent_id_path=PackedInt32Array(1166477692, 379926798, 172890232) index="2" unique_id=486532321]
-transform = Transform3D(1, 0, 0, 0, 0.39111784, 0.9203406, 0, -0.9203406, 0.39111784, 0, -18.071035, 0.9332483)
-
-[editable path="Plane"]
-[editable path="Plane/antsy-airplane"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.00808, 3.3974717, -28.441284)
