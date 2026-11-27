@@ -1,6 +1,7 @@
 extends GdUnitTestSuite
 ## Plane doors without a network: the E hint, opening outward about the hinge, the handle turning on its own axis
 ## (and keeping its scale), closing again, the cargo ramp lowering to the ground, and the Interactor picking the nearest thing.
+## Also the open and close sounds: the right one for each part, played from the part, delayed by its offset, and silent on a late-join snap.
 
 # Getting References for the helpers
 const TestWorld := preload("res://test/helpers/test_world.gd") # current scene, no airport
@@ -158,3 +159,69 @@ func test_cargo_ramp_is_usable_from_the_ground_behind_the_tail() -> void:
 	_world.place(me, _plane.to_global(Vector3(-1.315, GROUND_Y, -26.0)))
 	await await_millis(50)
 	assert_str(me.get_node("Interactor").prompt).is_empty()
+
+
+func _part(path: String) -> PlaneDoor:
+	## This function finds a door or control on the plane by its path
+	# path: e.g. "Doors/CargoDoor" or "Controls/ShiftHandle"
+	return _plane.get_node(path)
+
+
+func test_every_part_plays_its_open_and_close_sound() -> void:
+	var fuselage_open = load("res://assets/plane/Sounds/fuselage_door_open.mp3")
+	var fuselage_close = load("res://assets/plane/Sounds/fuselage_door_close.mp3")
+	var lever = load("res://assets/plane/Sounds/mechanical_lever.mp3")
+	var expected = {
+		"Doors/FrontDoorL": [fuselage_open, fuselage_close],
+		"Doors/FrontDoorR": [fuselage_open, fuselage_close],
+		"Doors/WingDoorL": [fuselage_open, fuselage_close],
+		"Doors/WingDoorR": [fuselage_open, fuselage_close],
+		"Doors/CargoDoor": [load("res://assets/plane/Sounds/cargo_door_open.mp3"), load("res://assets/plane/Sounds/cargo_door_close.mp3")],
+		"Controls/ShiftHandle": [lever, lever],
+	}
+	for path in expected:
+		var part = _part(path)
+		part.open_sound_offset = 0.0 # the tuned offsets would delay the sounds past these checks
+		part.close_sound_offset = 0.0
+		part.interact(1)
+		assert_object(part.audio_player.stream).override_failure_message("%s open sound" % path).is_same(expected[path][0])
+		assert_bool(part.audio_player.playing).override_failure_message("%s not playing" % path).is_true()
+		await await_millis(int(part.open_time * 1000) + 100)
+
+		part.interact(1)
+		assert_object(part.audio_player.stream).override_failure_message("%s close sound" % path).is_same(expected[path][1])
+		assert_bool(part.audio_player.playing).is_true()
+		await await_millis(int(part.open_time * 1000) + 100)
+
+
+func test_sound_comes_from_the_part() -> void:
+	for path in ["Doors/FrontDoorL", "Doors/WingDoorR", "Doors/CargoDoor", "Controls/ShiftHandle"]:
+		var part = _part(path)
+		var distance = part.audio_player.global_position.distance_to(part.door.global_position)
+		assert_float(distance).override_failure_message("%s sound is %.1f m away" % [path, distance]).is_less(3.0)
+
+
+func test_positive_offset_waits_before_playing() -> void:
+	var door = _door("FrontDoorL")
+	door.open_sound_offset = 0.3
+	door.interact(1)
+	assert_bool(door.audio_player.playing).is_false()
+	await await_millis(450)
+	assert_bool(door.audio_player.playing).is_true()
+
+
+func test_turning_around_cancels_a_waiting_sound() -> void:
+	var door = _door("FrontDoorL")
+	door.open_sound_offset = 0.5
+	door.close_sound_offset = 0.0
+	door.interact(1)
+	door.interact(1) # closes again before the open sound started
+	assert_object(door.audio_player.stream).is_same(door.close_sound)
+	await await_millis(650)
+	assert_object(door.audio_player.stream).is_same(door.close_sound)
+
+
+func test_late_join_snap_is_silent() -> void:
+	var door = _door("CargoDoor")
+	door._apply_state(true)
+	assert_bool(door.audio_player.playing).is_false()

@@ -2,6 +2,7 @@ extends GdUnitTestSuite
 ## Plane states without a network: the landing gear retracting and coming back, the propellers spinning up and
 ## stopping, opening doors through the setters, and the cockpit shift handle (which, for now, starts the
 ## propellers and retracts the gear).
+## Also their sounds: the gear on both moves, the engines starting into a loop and stopping, and a late joiner hearing running engines.
 
 # Getting References for the helpers
 const TestWorld := preload("res://test/helpers/test_world.gd") # current scene, no airport
@@ -148,3 +149,66 @@ func test_shift_handle_starts_propellers_and_retracts_gear() -> void:
 	handle.interact(1)
 	assert_bool(_plane.propellers.is_spinning).is_false()
 	assert_bool(_plane.landing_gear.is_down).is_true()
+
+
+func test_gear_plays_its_sound_both_ways() -> void:
+	var gear = _plane.landing_gear
+	_plane.set_gear_down(false)
+	assert_object(gear.audio_player.stream).is_same(gear.raise_sound)
+	assert_bool(gear.audio_player.playing).is_true()
+
+	_plane.set_gear_down(true)
+	assert_object(gear.audio_player.stream).is_same(gear.lower_sound)
+	assert_bool(gear.audio_player.playing).is_true()
+
+
+func test_engines_start_into_the_loop_and_stop() -> void:
+	var props = _plane.propellers
+	assert_int(props.audio_players.size()).is_equal(2)
+	assert_bool(props.loop_sound.loop).override_failure_message("engine_loop.mp3 must be imported with loop on").is_true()
+
+	_plane.set_propellers_spinning(true)
+	for player in props.audio_players:
+		assert_object(player.stream).is_same(props.start_sound)
+		assert_bool(player.playing).is_true()
+		player.stop()
+		player.finished.emit() # as if the start sound had played out
+		assert_object(player.stream).is_same(props.loop_sound)
+		assert_bool(player.playing).is_true()
+
+	_plane.set_propellers_spinning(false)
+	for player in props.audio_players:
+		assert_object(player.stream).is_same(props.stop_sound)
+		player.stop()
+		player.finished.emit() # the stop sound ending must not bring the loop back
+		assert_bool(player.playing).is_false()
+
+
+func test_engines_stopped_during_start_play_the_stop_sound() -> void:
+	var props = _plane.propellers
+	_plane.set_propellers_spinning(true)
+	_plane.set_propellers_spinning(false)
+	for player in props.audio_players:
+		assert_object(player.stream).is_same(props.stop_sound)
+
+
+func test_late_joiner_hears_running_engines_and_not_the_gear() -> void:
+	var props = _plane.propellers
+	props._apply_state(true)
+	for player in props.audio_players:
+		assert_object(player.stream).is_same(props.loop_sound)
+		assert_bool(player.playing).is_true()
+
+	_plane.landing_gear._apply_state(false)
+	assert_bool(_plane.landing_gear.audio_player.playing).is_false()
+
+	props._apply_state(false)
+	for player in props.audio_players:
+		assert_bool(player.playing).is_false()
+
+
+func test_engine_sounds_come_from_the_propellers() -> void:
+	var props = _plane.propellers
+	for i in props.blades.size():
+		var distance = props.audio_players[i].global_position.distance_to(props.blades[i].global_position)
+		assert_float(distance).is_less(1.0)

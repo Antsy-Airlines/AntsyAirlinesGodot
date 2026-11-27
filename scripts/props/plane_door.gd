@@ -6,6 +6,7 @@ extends Interactable
 ## The server decides open or closed; every computer plays the swing itself, so only one bool goes over the network.
 ## Rotations are local, so the door keeps working while the fuselage it hangs on moves.
 ## Also used for other hinged parts, like the cockpit shift handle (listen to `toggled` to react to it).
+## Each computer also plays the open or close sound from `audio_player` when the swing starts (not when snapping for late joiners).
 
 signal toggled(open: bool) # emitted on every computer when the server opens or closes it
 
@@ -20,6 +21,11 @@ signal toggled(open: bool) # emitted on every computer when the server opens or 
 @export var handle_axis: Vector3 = Vector3.RIGHT # turning axis in the handle's own space
 @export var handle_angle_deg: float = 45.0 # how far the handle turns at the middle of the swing
 @export var open_time: float = 1.0 # seconds for a full swing
+@export var audio_player: SoundCuePlayer # where the sounds come from (optional: no player = silent)
+@export var open_sound: AudioStream # played when it starts opening
+@export var close_sound: AudioStream # played when it starts closing
+@export var open_sound_offset: float = 0.0 # seconds; > 0 waits before playing, < 0 skips that far into the sound
+@export var close_sound_offset: float = 0.0 # seconds; > 0 waits before playing, < 0 skips that far into the sound
 
 # Declaring tracking variables
 var is_open: bool = false # what the server last said
@@ -98,6 +104,10 @@ func _set_open(open: bool) -> void:
 	_tween = create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	_tween.tween_method(_pose, _amount, goal, open_time * absf(goal - _amount))
+
+	# the sound starts with the swing; a new cue drops a stale one from a door turned around mid-swing
+	if audio_player != null:
+		audio_player.play_cue(open_sound if open else close_sound, open_sound_offset if open else close_sound_offset)
 
 
 func _pose(amount: float) -> void:
