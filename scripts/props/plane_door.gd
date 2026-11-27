@@ -5,6 +5,9 @@ extends Interactable
 ## while it swings, then settles back.
 ## The server decides open or closed; every computer plays the swing itself, so only one bool goes over the network.
 ## Rotations are local, so the door keeps working while the fuselage it hangs on moves.
+## Also used for other hinged parts, like the cockpit shift handle (listen to `toggled` to react to it).
+
+signal toggled(open: bool) # emitted on every computer when the server opens or closes it
 
 # Declaring Default/Const variables
 @export var door: Node3D # the door mesh, with its origin on the hinge
@@ -64,7 +67,19 @@ func get_distance(player: Node3D) -> float:
 func interact(_id: int) -> void:
 	## This function opens a closed door or closes an open one (server only)
 	# _id: the player who pressed E
-	_set_open.rpc(not is_open)
+	set_open(not is_open)
+
+
+func set_open(open: bool) -> void:
+	## This function opens or closes the door for everyone (server only)
+	# open: true to open, false to close
+	# Guard case for clients, who must ask the server instead
+	if not multiplayer.is_server():
+		return
+	# Guard case for the door already being that way
+	if open == is_open:
+		return
+	_set_open.rpc(open)
 
 
 @rpc("authority", "call_local", "reliable")
@@ -72,6 +87,7 @@ func _set_open(open: bool) -> void:
 	## This function runs on everyone when the door is opened or closed, and plays the swing
 	# open: true to open, false to close
 	is_open = open
+	toggled.emit(open)
 	var goal = 1.0 if open else 0.0
 
 	# stopping a swing that is halfway, so the door can turn around

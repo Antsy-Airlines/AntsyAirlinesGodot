@@ -4,8 +4,16 @@
 [ext_resource type="Material" uid="uid://0qebbynurrvn" path="res://assets/plane/glass.tres" id="2_7u8ti"]
 [ext_resource type="Material" uid="uid://ws2cy1dr6sn5" path="res://assets/plane/light.tres" id="2_ctdb1"]
 [ext_resource type="Script" uid="uid://cb2jr1pcvuhx1" path="res://scripts/props/plane_door.gd" id="3_door"]
+[ext_resource type="Script" uid="uid://boswe8jflodig" path="res://scripts/props/airplane.gd" id="4_airplane"]
+[ext_resource type="Script" uid="uid://b6ykb4pnl46hr" path="res://scripts/props/landing_gear.gd" id="5_gear"]
+[ext_resource type="Script" uid="uid://4bpf0otxd3yq" path="res://scripts/props/propellers.gd" id="6_props"]
 
-[node name="Plane" type="Node3D" unique_id=1166477692]
+[node name="Plane" type="Node3D" unique_id=1166477692 node_paths=PackedStringArray("landing_gear", "propellers", "doors_root", "shift_handle")]
+script = ExtResource("4_airplane")
+landing_gear = NodePath("Systems/LandingGear")
+propellers = NodePath("Systems/Propellers")
+doors_root = NodePath("Doors")
+shift_handle = NodePath("Controls/ShiftHandle")
 
 [node name="antsy-airplane" parent="." unique_id=379926798 instance=ExtResource("1_nuwi0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.315359, 0, 3.1745157)
@@ -74,5 +82,27 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.315, -3.4, -19)
 
 [node name="InsideReach" type="Marker3D" parent="Doors/CargoDoor" unique_id=1166477707]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.315, -0.59, -14.5)
+
+[node name="Systems" type="Node3D" parent="." unique_id=1166477710]
+
+[node name="LandingGear" type="Node3D" parent="Systems" unique_id=1166477711 node_paths=PackedStringArray("wheels")]
+script = ExtResource("5_gear")
+wheels = NodePath("../../antsy-airplane/Fuselage/LandingGearWheels")
+retract_distance = 1.3
+
+[node name="Propellers" type="Node3D" parent="Systems" unique_id=1166477712 node_paths=PackedStringArray("blades")]
+script = ExtResource("6_props")
+blades = [NodePath("../../antsy-airplane/Fuselage/Propellor_L"), NodePath("../../antsy-airplane/Fuselage/Propellor_R")]
+
+[node name="Controls" type="Node3D" parent="." unique_id=1166477713]
+
+[node name="ShiftHandle" type="Node3D" parent="Controls" unique_id=1166477714 node_paths=PackedStringArray("door")]
+script = ExtResource("3_door")
+door = NodePath("../../antsy-airplane/Fuselage/ShiftHandle")
+open_prompt = "Press E to start the engines"
+close_prompt = "Press E to stop the engines"
+open_angle_deg = 40.0
+open_time = 0.5
+interact_range = 2.0
 
 [editable path="antsy-airplane"]
