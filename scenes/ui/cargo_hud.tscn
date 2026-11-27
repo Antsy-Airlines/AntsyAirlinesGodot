@@ -1,22 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/cargo_hud.gd" id="1_cargo_hud"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_box"]
-content_margin_left = 18.0
-content_margin_top = 10.0
-content_margin_right = 18.0
-content_margin_bottom = 10.0
-bg_color = Color(0.07, 0.09, 0.15, 0.85)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 1, 1, 0.08)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+[ext_resource type="StyleBox" path="res://scenes/ui/hud_panel_style.tres" id="2_panel_style"]
 
 [node name="CargoHud" type="CanvasLayer"]
 script = ExtResource("1_cargo_hud")
@@ -26,7 +11,7 @@ offset_left = 16.0
 offset_top = 16.0
 offset_right = 216.0
 offset_bottom = 58.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+theme_override_styles/panel = ExtResource("2_panel_style")
 
 [node name="Counter" type="Label" parent="CounterPanel"]
 unique_name_in_owner = true
@@ -34,26 +19,4 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.98, 0.66, 0.22, 1)
 theme_override_font_sizes/font_size = 18
 text = "Cargo 0/0 loaded"
-horizontal_alignment = 1
-
-[node name="PromptPanel" type="PanelContainer" parent="."]
-unique_name_in_owner = true
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -150.0
-offset_top = -110.0
-offset_right = 150.0
-offset_bottom = -70.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_box")
-
-[node name="Prompt" type="Label" parent="PromptPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.95, 0.86, 1)
-theme_override_font_sizes/font_size = 17
 horizontal_alignment = 1

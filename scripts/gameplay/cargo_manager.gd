@@ -1,10 +1,10 @@
-extends Node3D
+extends Interactable
 ## Cargo loading: players press E to pick up a crate, carry it out to the plane and drop it on the cargo hold pad.
 ## Heavy crates need two players: each presses E on it, then they carry it together, slower.
 ## The server decides who holds what and what counts as loaded. Every computer just shows the result.
+## E presses and the prompt come through each player's Interactor, like every other Interactable.
 
 signal cargo_changed(loaded: int, total: int) # everyone: how many crates are in the hold
-signal prompt_changed(text: String) # this computer: what the E hint should say ("" hides it)
 
 # Declaring Default/Const variables
 const PICK_RANGE := 2.5 # metres a player can reach a crate from
@@ -20,12 +20,12 @@ const HEAVY_SPEED := 0.6 # walk speed while carrying a heavy crate (1 = normal)
 @onready var _crates: Node3D = $Crates # every crate in this level
 @onready var _hold: Node3D = $HoldZone # middle of the cargo hold pad next to the plane
 
-# Declaring tracking variables
-var _prompt: String = "" # last hint we showed, so we only send changes
-
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	interact_range = PICK_RANGE
+
+
 	# showing the counter from the start (deferred so the HUD is connected first)
 	_emit_count.call_deferred()
 
@@ -42,14 +42,8 @@ func _process(_delta: float) -> void:
 	if multiplayer.is_server():
 		_check_heavy()
 
-	# updating the E hint for our own player
-	var me = _player(multiplayer.get_unique_id())
-	var text = _hint_for(me)
-	if text != _prompt:
-		_prompt = text
-		prompt_changed.emit(text)
-
 	# Guard case for a computer without a player (the server)
+	var me = _player(multiplayer.get_unique_id())
 	if me == null:
 		return
 
@@ -58,16 +52,24 @@ func _process(_delta: float) -> void:
 	me.speed_mul = HEAVY_SPEED if held != null and held.heavy and held.is_lifted() else 1.0
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	# only E matters here
-	if not event.is_action_pressed("interact"):
-		return
+func get_prompt(player: Node3D) -> String:
+	## This function says what pressing E would do for a player right now (see Interactable)
+	# player: the player asking
+	return _hint_for(player)
 
-	# Guard case for a computer without a player (the server)
-	if _player(multiplayer.get_unique_id()) == null:
-		return
 
-	_request_interact.rpc_id(1) # the server decides if this is a pick up or a drop
+func get_distance(player: Node3D) -> float:
+	## This function says how far a player is from the crate E would use (see Interactable)
+	# player: the player asking
+	# carrying or holding a crate always wins, so E never opens a door with a crate in hand
+	if _held_by(player.name.to_int()) != null:
+		return 0.0
+
+	# Guard case for no crate in reach
+	var crate = _nearest_free(player.global_position, player.name.to_int())
+	if crate == null:
+		return INF
+	return _floor_distance(crate.global_position, player.global_position)
 
 
 func _hint_for(me: Node3D) -> String:
@@ -97,12 +99,6 @@ func _hint_for(me: Node3D) -> String:
 	if crate.heavy:
 		return "Press E to help lift" if crate.holder_id != 0 else "Press E to grab (needs 2 players)"
 	return "Press E to pick up"
-
-
-@rpc("any_peer", "call_local", "reliable")
-func _request_interact() -> void:
-	## This function runs on the server when a player presses E
-	interact(_sender_id())
 
 
 func interact(id: int) -> void:
@@ -306,13 +302,18 @@ func _nearest_free(pos: Vector3, id: int) -> Node3D:
 		if crate.holder_id != 0 and not open_side:
 			continue
 
-		# measuring on the floor only, so height doesn't matter
-		var dif = crate.global_position - pos
-		var dist = Vector2(dif.x, dif.z).length()
+		var dist = _floor_distance(crate.global_position, pos)
 		if dist < best_dist:
 			best = crate
 			best_dist = dist
 	return best
+
+
+func _floor_distance(a: Vector3, b: Vector3) -> float:
+	## This function measures between two points on the floor only, so height doesn't matter
+	# a: one point
+	# b: the other point
+	return Vector2(a.x - b.x, a.z - b.z).length()
 
 
 func _held_by(id: int) -> Node3D:

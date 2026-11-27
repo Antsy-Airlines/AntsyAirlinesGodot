@@ -9,6 +9,8 @@
 [ext_resource type="AudioStream" uid="uid://b8pyfaji0prdu" path="res://assets/Sounds/footstep.mp3" id="7_fjrip"]
 [ext_resource type="AudioStream" uid="uid://hvdqbf3vw8oo" path="res://assets/Sounds/jump.mp3" id="8_ur7pv"]
 [ext_resource type="AudioStream" uid="uid://57s151ju2b1i" path="res://assets/Sounds/land.mp3" id="9_y4r1p"]
+[ext_resource type="Script" path="res://scripts/interaction/interactor.gd" id="10_interactor"]
+[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="11_prompt"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dkdl3"]
 radius = 0.3071289
@@ -167,6 +169,11 @@ transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
 spring_length = 4.0
 
 [node name="FrontCamera" type="Camera3D" parent="CameraPivot/FrontArm" unique_id=1369421763]
+
+[node name="Interactor" type="Node" parent="." unique_id=1592640117]
+script = ExtResource("10_interactor")
+
+[node name="InteractionPrompt" parent="Interactor" unique_id=1592640118 instance=ExtResource("11_prompt")]
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1413111630]
 replication_config = SubResource("SceneReplicationConfig_g2els")

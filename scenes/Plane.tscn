@@ -3,34 +3,59 @@
 [ext_resource type="PackedScene" uid="uid://cyy5prda1nmqx" path="res://assets/plane/antsy-airplane.glb" id="1_nuwi0"]
 [ext_resource type="Material" uid="uid://0qebbynurrvn" path="res://assets/plane/glass.tres" id="2_7u8ti"]
 [ext_resource type="Material" uid="uid://ws2cy1dr6sn5" path="res://assets/plane/light.tres" id="2_ctdb1"]
+[ext_resource type="Script" uid="uid://cb2jr1pcvuhx1" path="res://scripts/props/plane_door.gd" id="3_door"]
 
 [node name="Plane" type="Node3D" unique_id=1166477692]
 
 [node name="antsy-airplane" parent="." unique_id=379926798 instance=ExtResource("1_nuwi0")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.315359, 0, 3.1745157)
 
-[node name="CabinLight" parent="antsy-airplane/Fuselage" parent_id_path=PackedInt32Array(379926798, 2028117412) index="0" unique_id=57246318]
+[node name="CabinLight" parent="antsy-airplane/Fuselage" parent_id_path=PackedInt32Array(379926798, 172890232) index="0" unique_id=521102474]
 material_override = ExtResource("2_ctdb1")
 
-[node name="CabinLight_001" parent="antsy-airplane/Fuselage" parent_id_path=PackedInt32Array(379926798, 2028117412) index="1" unique_id=1371785492]
+[node name="CabinLight_001" parent="antsy-airplane/Fuselage" parent_id_path=PackedInt32Array(379926798, 172890232) index="1" unique_id=1569867399]
 material_override = ExtResource("2_ctdb1")
 
-[node name="CockpitWindows" parent="antsy-airplane/Fuselage" parent_id_path=PackedInt32Array(379926798, 2028117412) index="4" unique_id=1131919349]
+[node name="CockpitWindows" parent="antsy-airplane/Fuselage" parent_id_path=PackedInt32Array(379926798, 172890232) index="4" unique_id=294682845]
 material_override = ExtResource("2_7u8ti")
 
-[node name="DoorWindow" parent="antsy-airplane/Fuselage/FrontDoor_L" parent_id_path=PackedInt32Array(379926798, 241040807) index="1" unique_id=1835513713]
+[node name="DoorWindow" parent="antsy-airplane/Fuselage/FrontDoor_L" parent_id_path=PackedInt32Array(379926798, 1296411930) index="1" unique_id=1098969895]
 material_override = ExtResource("2_7u8ti")
 
-[node name="DoorWindow_001" parent="antsy-airplane/Fuselage/FrontDoor_R" parent_id_path=PackedInt32Array(379926798, 398169593) index="1" unique_id=942610355]
+[node name="DoorWindow_001" parent="antsy-airplane/Fuselage/FrontDoor_R" parent_id_path=PackedInt32Array(379926798, 1598565709) index="1" unique_id=714059314]
 material_override = ExtResource("2_7u8ti")
 
-[node name="Windows" parent="antsy-airplane/Fuselage" parent_id_path=PackedInt32Array(379926798, 2028117412) index="25" unique_id=1245546925]
+[node name="Windows" parent="antsy-airplane/Fuselage" parent_id_path=PackedInt32Array(379926798, 172890232) index="25" unique_id=596122309]
 material_override = ExtResource("2_7u8ti")
 
-[node name="DoorWindow_002" parent="antsy-airplane/Fuselage/WingDoor_L" parent_id_path=PackedInt32Array(379926798, 751587752) index="1" unique_id=1226982704]
+[node name="DoorWindow_002" parent="antsy-airplane/Fuselage/WingDoor_L" parent_id_path=PackedInt32Array(379926798, 1357151380) index="1" unique_id=697813055]
 material_override = ExtResource("2_7u8ti")
 
-[node name="DoorWindow_003" parent="antsy-airplane/Fuselage/WingDoor_R" parent_id_path=PackedInt32Array(379926798, 1308403499) index="1" unique_id=687689318]
+[node name="DoorWindow_003" parent="antsy-airplane/Fuselage/WingDoor_R" parent_id_path=PackedInt32Array(379926798, 671491100) index="1" unique_id=739388752]
 material_override = ExtResource("2_7u8ti")
+
+[node name="Doors" type="Node3D" parent="." unique_id=1166477700]
+
+[node name="FrontDoorL" type="Node3D" parent="Doors" unique_id=1166477701 node_paths=PackedStringArray("door", "handle")]
+script = ExtResource("3_door")
+door = NodePath("../../antsy-airplane/Fuselage/FrontDoor_L")
+handle = NodePath("../../antsy-airplane/Fuselage/FrontDoor_L/Doorhandle")
+open_angle_deg = -90.0
+
+[node name="FrontDoorR" type="Node3D" parent="Doors" unique_id=1166477702 node_paths=PackedStringArray("door", "handle")]
+script = ExtResource("3_door")
+door = NodePath("../../antsy-airplane/Fuselage/FrontDoor_R")
+handle = NodePath("../../antsy-airplane/Fuselage/FrontDoor_R/Doorhandle_001")
+
+[node name="WingDoorL" type="Node3D" parent="Doors" unique_id=1166477703 node_paths=PackedStringArray("door", "handle")]
+script = ExtResource("3_door")
+door = NodePath("../../antsy-airplane/Fuselage/WingDoor_L")
+handle = NodePath("../../antsy-airplane/Fuselage/WingDoor_L/Doorhandle_002")
+open_angle_deg = -90.0
+
+[node name="WingDoorR" type="Node3D" parent="Doors" unique_id=1166477704 node_paths=PackedStringArray("door", "handle")]
+script = ExtResource("3_door")
+door = NodePath("../../antsy-airplane/Fuselage/WingDoor_R")
+handle = NodePath("../../antsy-airplane/Fuselage/WingDoor_R/Doorhandle_003")
 
 [editable path="antsy-airplane"]

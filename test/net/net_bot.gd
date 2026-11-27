@@ -221,9 +221,9 @@ func _state() -> Dictionary:
 			"pos": _vec(crate.global_position),
 		}
 	s["loaded"] = cargo._loaded_count()
-	s["prompt"] = cargo._prompt
 	var me = _me()
 	if me != null:
+		s["prompt"] = me.get_node("Interactor").prompt # the E hint our screen shows
 		s["speed"] = me.speed_mul
 	return s
 
