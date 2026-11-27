@@ -8,6 +8,8 @@
 [ext_resource type="AudioStream" uid="uid://57s151ju2b1i" path="res://assets/Sounds/land.mp3" id="9_y4r1p"]
 [ext_resource type="Script" uid="uid://d3331108xble2" path="res://scripts/interaction/interactor.gd" id="10_interactor"]
 [ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="11_prompt"]
+[ext_resource type="Script" uid="uid://y6en05vv1igs" path="res://scripts/player/head_look.gd" id="12_headlook"]
+[ext_resource type="PackedScene" path="res://scenes/ui/seat_hint.tscn" id="13_seathint"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dkdl3"]
 radius = 0.3071289
@@ -26,6 +28,9 @@ properties/2/replication_mode = 1
 properties/3/path = NodePath(".:rotation")
 properties/3/spawn = true
 properties/3/replication_mode = 1
+properties/4/path = NodePath(".:head_look")
+properties/4/spawn = true
+properties/4/replication_mode = 1
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f6mlu"]
 resource_name = "Material"
@@ -1426,6 +1431,9 @@ mesh = SubResource("ArrayMesh_dod0j")
 skin = SubResource("Skin_vampf")
 skeleton = NodePath("..")
 
+[node name="HeadLook" type="SkeletonModifier3D" parent="CharacterMesh/Armature/Skeleton3D" unique_id=1270706700]
+script = ExtResource("12_headlook")
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1860310674]
 root_node = NodePath("../CharacterMesh")
 libraries/ = SubResource("AnimationLibrary_8ydkj")
@@ -1446,3 +1454,5 @@ billboard = 1
 modulate = Color(1, 0.95, 0.86, 1)
 outline_modulate = Color(0.04, 0.06, 0.12, 1)
 font_size = 48
+
+[node name="SeatHint" parent="." unique_id=1721963800 instance=ExtResource("13_seathint")]

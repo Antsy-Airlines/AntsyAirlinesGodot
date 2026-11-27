@@ -8,7 +8,7 @@ const TestWorld := preload("res://test/helpers/test_world.gd") # current scene, 
 const PLANE_SCENE := preload("res://scenes/Plane.tscn") # the plane with its parts
 
 # Declaring Default/Const variables
-const COCKPIT_FLOOR := Vector3(-1.315, -0.55, 12.3) # plane space: standing just behind the shift handle
+const COCKPIT_FLOOR := Vector3(-1.315, -0.55, 13.0) # plane space: standing between the pilot seats at the shift handle (closer than either seat)
 
 # Declaring tracking variables
 var _world # fresh world for each test

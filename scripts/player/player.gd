@@ -1,5 +1,6 @@
 extends CharacterBody3D
 
+signal seat_changed(seated: bool) # emitted on every computer when this player sits down or gets up
 
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
@@ -14,6 +15,8 @@ const STEP_PROBE_DISTANCE = 0.05 # how far past a ledge's edge the surface check
 @export var on_floor_previous: bool
 @export var just_landed: bool
 @export var velocity_proxy: Vector3 = Vector3.ZERO
+@export var head_look: Vector2 = Vector2.ZERO # radians (yaw, pitch) the head turns while seated, set by our camera and synced
+var seat: Seat = null # the seat this player sits in (null when standing), set on every computer by the seat
 var username: String = "" # name from the title screen, set by the spawner before the player is added
 var speed_mul: float = 1.0 # walk speed scale, lowered by the cargo manager while carrying something heavy
 
@@ -34,7 +37,10 @@ func _ready() -> void:
 	name_tag.visible = !is_multiplayer_authority() # hiding our own tag, others still see it
 
 func _update_animation() -> void:
-	if not on_floor:
+	if seat != null:
+		animation_player.speed_scale = 1
+		animation_player.play("sit")
+	elif not on_floor:
 		animation_player.speed_scale = 1
 		animation_player.play("fall")
 	elif velocity_proxy.length() > 0.1:
@@ -60,6 +66,11 @@ func _physics_process(delta: float) -> void:
 	_update_animation()
 
 	if !is_multiplayer_authority():
+		return
+
+	# Guard case for sitting: the seat holds us, and Jump only gets us up
+	if seat != null:
+		_stay_seated()
 		return
 
 	# Add the gravity.
@@ -91,6 +102,49 @@ func _physics_process(delta: float) -> void:
 		land_sound.play()
 	on_floor_previous = on_floor
 	velocity_proxy = velocity
+
+
+func take_seat(new_seat: Seat) -> void:
+	## This function sits the player down (runs on every computer; our own computer moves us onto the seat)
+	# new_seat: the seat we sit in
+	seat = new_seat
+	velocity = Vector3.ZERO
+	velocity_proxy = Vector3.ZERO
+	if is_multiplayer_authority():
+		head_look = Vector2.ZERO
+		global_transform = new_seat.sit_transform()
+	seat_changed.emit(true)
+
+
+func leave_seat(old_seat: Seat) -> void:
+	## This function gets the player up (runs on every computer; our own computer moves us to the seat's exit point)
+	# old_seat: the seat we are getting up from
+	# Guard case for a seat we aren't in
+	if seat != old_seat:
+		return
+	seat = null
+	if is_multiplayer_authority():
+		global_transform = old_seat.exit_transform()
+		on_floor_previous = true # standing up isn't a landing
+	seat_changed.emit(false)
+	head_look = Vector2.ZERO
+
+
+func _stay_seated() -> void:
+	## This function keeps our seated player on the seat, and turns a Jump press into getting up (the press is used up)
+	if Input.is_action_just_pressed("jump"):
+		seat.request_stand()
+		# Guard case for having got up already (offline, the server answers at once)
+		if seat == null:
+			return
+
+	# following the seat, so we stay put when the plane moves
+	global_transform = seat.sit_transform()
+	velocity = Vector3.ZERO
+	velocity_proxy = Vector3.ZERO
+	on_floor = true
+	on_floor_previous = true
+	just_landed = false
 
 
 func _is_grounded() -> bool:
