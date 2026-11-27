@@ -144,3 +144,17 @@ func test_cargo_ramp_lowers_to_the_ground_and_back() -> void:
 	ramp.interact(1)
 	await await_millis(int(ramp.open_time * 1000) + 150)
 	assert_vector(_plane.to_local(ramp.door.to_global(RAMP_TIP))).is_equal_approx(tip_closed, Vector3.ONE * 0.01)
+
+
+func test_cargo_ramp_is_usable_from_the_ground_behind_the_tail() -> void:
+	# standing on the ground under the tail, far below the ramp itself (no jumping needed)
+	var ramp = _door("CargoDoor")
+	var me = _world.add_player(1, _plane.to_global(Vector3(-1.315, GROUND_Y, -20.0)))
+	await await_millis(50)
+	assert_object(me.get_node("Interactor").target).is_same(ramp)
+	assert_str(me.get_node("Interactor").prompt).is_equal(ramp.open_prompt)
+
+	# walking well away from both reach points: no prompt
+	_world.place(me, _plane.to_global(Vector3(-1.315, GROUND_Y, -26.0)))
+	await await_millis(50)
+	assert_str(me.get_node("Interactor").prompt).is_empty()

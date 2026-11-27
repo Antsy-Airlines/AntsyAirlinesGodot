@@ -58,14 +58,21 @@ script = ExtResource("3_door")
 door = NodePath("../../antsy-airplane/Fuselage/WingDoor_R")
 handle = NodePath("../../antsy-airplane/Fuselage/WingDoor_R/Doorhandle_003")
 
-[node name="CargoDoor" type="Node3D" parent="Doors" node_paths=PackedStringArray("door") unique_id=1166477705]
+[node name="CargoDoor" type="Node3D" parent="Doors" unique_id=1166477705 node_paths=PackedStringArray("door", "reach_points")]
 script = ExtResource("3_door")
 door = NodePath("../../antsy-airplane/Fuselage/CargoDoor")
+reach_points = [NodePath("OutsideReach"), NodePath("InsideReach")]
 open_prompt = "Press E to lower the cargo ramp"
 close_prompt = "Press E to raise the cargo ramp"
 open_angle_deg = -77.0
 hinge_axis = Vector3(1, 0, 0)
 open_time = 2.0
 interact_range = 3.5
+
+[node name="OutsideReach" type="Marker3D" parent="Doors/CargoDoor" unique_id=1166477706]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.315, -3.4, -19)
+
+[node name="InsideReach" type="Marker3D" parent="Doors/CargoDoor" unique_id=1166477707]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.315, -0.59, -14.5)
 
 [editable path="antsy-airplane"]

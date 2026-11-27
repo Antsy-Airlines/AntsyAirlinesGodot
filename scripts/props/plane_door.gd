@@ -9,6 +9,7 @@ extends Interactable
 # Declaring Default/Const variables
 @export var door: Node3D # the door mesh, with its origin on the hinge
 @export var handle: Node3D # the handle mesh under the door (optional: the cargo ramp has none)
+@export var reach_points: Array[Node3D] = [] # spots players use it from (e.g. Marker3Ds); empty = the handle, else the door's middle
 @export var open_prompt: String = "Press E to open the door" # E hint while closed
 @export var close_prompt: String = "Press E to close the door" # E hint while open
 @export var open_angle_deg: float = 90.0 # how far it swings, signed so it opens outward
@@ -48,9 +49,16 @@ func get_prompt(_player: Node3D) -> String:
 
 
 func get_distance(player: Node3D) -> float:
-	## This function measures to the handle (or the door's middle), so it works from inside and outside (see Interactable)
+	## This function measures to the nearest reach point, or else the handle (or the door's middle) (see Interactable)
 	# player: the player asking
-	return door.to_global(_reach_point).distance_to(player.global_position)
+	# Guard case for a door without reach points
+	if reach_points.is_empty():
+		return door.to_global(_reach_point).distance_to(player.global_position)
+
+	var best = INF
+	for point in reach_points:
+		best = minf(best, point.global_position.distance_to(player.global_position))
+	return best
 
 
 func interact(_id: int) -> void:
