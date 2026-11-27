@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://y86ityl727gn"
-path="res://.godot/imported/JohnDavisRig.glb-bb06b12683d8f1992ead2e9200399959.scn"
+path="res://.godot/imported/JohnDavisRig.glb-4cc9557653dc451e01838061b3e910f4.scn"
 
 [deps]
 
-source_file="res://assets/JohnDavisRig.glb"
-dest_files=["res://.godot/imported/JohnDavisRig.glb-bb06b12683d8f1992ead2e9200399959.scn"]
+source_file="res://assets/characters/JohnDavisRig.glb"
+dest_files=["res://.godot/imported/JohnDavisRig.glb-4cc9557653dc451e01838061b3e910f4.scn"]
 
 [params]
 

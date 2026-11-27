@@ -2,21 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://65tslu67hyfe"
-path.s3tc="res://.godot/imported/airplane-antsy-airlines_cockpit_controls.png-7d3554a644e2d9174d4cc043346d3f73.s3tc.ctex"
-path.etc2="res://.godot/imported/airplane-antsy-airlines_cockpit_controls.png-7d3554a644e2d9174d4cc043346d3f73.etc2.ctex"
+uid="uid://bnibc8hbng5d3"
+path.s3tc="res://.godot/imported/antsy-airplane_seat_texture.png-103d8affdb92da98ef282adf7375794b.s3tc.ctex"
+path.etc2="res://.godot/imported/antsy-airplane_seat_texture.png-103d8affdb92da98ef282adf7375794b.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "d40d045a3593e2643f2d7c7baaf25f1d"
+"md5": "25da0dddd8c5e5cefae391c7857d370d"
 }
 
 [deps]
 
-source_file="res://assets/airplane-antsy-airlines_cockpit_controls.png"
-dest_files=["res://.godot/imported/airplane-antsy-airlines_cockpit_controls.png-7d3554a644e2d9174d4cc043346d3f73.s3tc.ctex", "res://.godot/imported/airplane-antsy-airlines_cockpit_controls.png-7d3554a644e2d9174d4cc043346d3f73.etc2.ctex"]
+source_file="res://assets/plane/antsy-airplane_seat_texture.png"
+dest_files=["res://.godot/imported/antsy-airplane_seat_texture.png-103d8affdb92da98ef282adf7375794b.s3tc.ctex", "res://.godot/imported/antsy-airplane_seat_texture.png-103d8affdb92da98ef282adf7375794b.etc2.ctex"]
 
 [params]
 

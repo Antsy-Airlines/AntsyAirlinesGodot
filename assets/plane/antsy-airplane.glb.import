@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://btwconmeb2lpc"
-path="res://.godot/imported/airplane-antsy-airlines.glb-6f3458736f87e31b599c33c2a9467953.scn"
+uid="uid://cyy5prda1nmqx"
+path="res://.godot/imported/antsy-airplane.glb-df9af4bfe44d12c8a0b4c84d6bf94f30.scn"
 
 [deps]
 
-source_file="res://assets/airplane-antsy-airlines.glb"
-dest_files=["res://.godot/imported/airplane-antsy-airlines.glb-6f3458736f87e31b599c33c2a9467953.scn"]
+source_file="res://assets/plane/antsy-airplane.glb"
+dest_files=["res://.godot/imported/antsy-airplane.glb-df9af4bfe44d12c8a0b4c84d6bf94f30.scn"]
 
 [params]
 
@@ -39,7 +39,15 @@ import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={}
+_subresources={
+"materials": {
+"Glass": {
+"use_external/enabled": true,
+"use_external/fallback_path": "",
+"use_external/path": ""
+}
+}
+}
 gltf/naming_version=2
 gltf/embedded_image_handling=1
 gltf/texture_map_mode=1

@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjsh3hexkc0cw"
-path.s3tc="res://.godot/imported/airplane-antsy-airlines_carpet.png-f462765ca74d626f133bd0037f2105a2.s3tc.ctex"
-path.etc2="res://.godot/imported/airplane-antsy-airlines_carpet.png-f462765ca74d626f133bd0037f2105a2.etc2.ctex"
+uid="uid://wqrjvlnuiikt"
+path.s3tc="res://.godot/imported/antsy-airplane_carpet.png-4fc9ecb40152fc586c2100bc65f75af8.s3tc.ctex"
+path.etc2="res://.godot/imported/antsy-airplane_carpet.png-4fc9ecb40152fc586c2100bc65f75af8.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -15,8 +15,8 @@ generator_parameters={
 
 [deps]
 
-source_file="res://assets/airplane-antsy-airlines_carpet.png"
-dest_files=["res://.godot/imported/airplane-antsy-airlines_carpet.png-f462765ca74d626f133bd0037f2105a2.s3tc.ctex", "res://.godot/imported/airplane-antsy-airlines_carpet.png-f462765ca74d626f133bd0037f2105a2.etc2.ctex"]
+source_file="res://assets/plane/antsy-airplane_carpet.png"
+dest_files=["res://.godot/imported/antsy-airplane_carpet.png-4fc9ecb40152fc586c2100bc65f75af8.s3tc.ctex", "res://.godot/imported/antsy-airplane_carpet.png-4fc9ecb40152fc586c2100bc65f75af8.etc2.ctex"]
 
 [params]
 

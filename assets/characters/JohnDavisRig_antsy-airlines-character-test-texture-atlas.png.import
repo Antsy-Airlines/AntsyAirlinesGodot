@@ -2,21 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cb3qfuji48g2n"
-path.s3tc="res://.godot/imported/airplane-antsy-airlines_seat_texture.png-a4816acce0dc332c63fc64dc1d8a9242.s3tc.ctex"
-path.etc2="res://.godot/imported/airplane-antsy-airlines_seat_texture.png-a4816acce0dc332c63fc64dc1d8a9242.etc2.ctex"
+uid="uid://qprpl1hpb4qg"
+path.s3tc="res://.godot/imported/JohnDavisRig_antsy-airlines-character-test-texture-atlas.png-ac6b7f7413c43332864515e9ae5eab10.s3tc.ctex"
+path.etc2="res://.godot/imported/JohnDavisRig_antsy-airlines-character-test-texture-atlas.png-ac6b7f7413c43332864515e9ae5eab10.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "25da0dddd8c5e5cefae391c7857d370d"
+"md5": "bab54f24e2406568e028ae8d6272b349"
 }
 
 [deps]
 
-source_file="res://assets/airplane-antsy-airlines_seat_texture.png"
-dest_files=["res://.godot/imported/airplane-antsy-airlines_seat_texture.png-a4816acce0dc332c63fc64dc1d8a9242.s3tc.ctex", "res://.godot/imported/airplane-antsy-airlines_seat_texture.png-a4816acce0dc332c63fc64dc1d8a9242.etc2.ctex"]
+source_file="res://assets/characters/JohnDavisRig_antsy-airlines-character-test-texture-atlas.png"
+dest_files=["res://.godot/imported/JohnDavisRig_antsy-airlines-character-test-texture-atlas.png-ac6b7f7413c43332864515e9ae5eab10.s3tc.ctex", "res://.godot/imported/JohnDavisRig_antsy-airlines-character-test-texture-atlas.png-ac6b7f7413c43332864515e9ae5eab10.etc2.ctex"]
 
 [params]
 

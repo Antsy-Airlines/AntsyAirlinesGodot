@@ -2,21 +2,21 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://hohvhr1lwt65"
-path.s3tc="res://.godot/imported/airplane-antsy-airlines_antsy-airlines-character-test-texture-atlas.png-5f952d4c693670d8266e4c4bba23f52d.s3tc.ctex"
-path.etc2="res://.godot/imported/airplane-antsy-airlines_antsy-airlines-character-test-texture-atlas.png-5f952d4c693670d8266e4c4bba23f52d.etc2.ctex"
+uid="uid://mdfkd2cjor81"
+path.s3tc="res://.godot/imported/antsy-airplane_cockpit_controls.png-25f9e9c6a17cb5e4cb980cefb766019f.s3tc.ctex"
+path.etc2="res://.godot/imported/antsy-airplane_cockpit_controls.png-25f9e9c6a17cb5e4cb980cefb766019f.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "bab54f24e2406568e028ae8d6272b349"
+"md5": "d40d045a3593e2643f2d7c7baaf25f1d"
 }
 
 [deps]
 
-source_file="res://assets/airplane-antsy-airlines_antsy-airlines-character-test-texture-atlas.png"
-dest_files=["res://.godot/imported/airplane-antsy-airlines_antsy-airlines-character-test-texture-atlas.png-5f952d4c693670d8266e4c4bba23f52d.s3tc.ctex", "res://.godot/imported/airplane-antsy-airlines_antsy-airlines-character-test-texture-atlas.png-5f952d4c693670d8266e4c4bba23f52d.etc2.ctex"]
+source_file="res://assets/plane/antsy-airplane_cockpit_controls.png"
+dest_files=["res://.godot/imported/antsy-airplane_cockpit_controls.png-25f9e9c6a17cb5e4cb980cefb766019f.s3tc.ctex", "res://.godot/imported/antsy-airplane_cockpit_controls.png-25f9e9c6a17cb5e4cb980cefb766019f.etc2.ctex"]
 
 [params]
 
