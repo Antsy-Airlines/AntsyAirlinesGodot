@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
 ## Cargo in the real airport without a network: picking up, dropping, loading, heavy crates and their edge cases.
-## cargo.interact(id) is what the server runs when player <id> presses E.
+## cargo.interact(id) is what the server runs when player <id> presses E (through their Interactor).
 
 # Getting References for the helpers
 const TestWorld := preload("res://test/helpers/test_world.gd") # current scene with the airport
@@ -8,8 +8,7 @@ const ManagerScript := preload("res://scripts/gameplay/cargo_manager.gd") # the 
 
 # Declaring Default/Const variables
 const FACE_OUT := 90.0 # yaw that faces +x
-const PAD := Vector3(-37, 0.05, -35) # middle of the hold pad
-const PAD_LEFT := Vector3(-38.5, 0.05, -35) # standing just left of the middle, facing +x so drops land on the pad
+const PAD_STAND := 1.5 # metres left of the pad middle to stand, facing +x so drops land on the pad
 
 # Declaring tracking variables
 var _world # fresh airport for each test
@@ -30,6 +29,17 @@ func after_test() -> void:
 	await await_idle_frame()
 
 
+func _pad() -> Vector3:
+	## This function gives the middle of the hold pad, read from the level so moving the pad doesn't break tests
+	var middle = _cargo.get_node("HoldZone").global_position
+	return Vector3(middle.x, 0.05, middle.z)
+
+
+func _pad_left() -> Vector3:
+	## This function gives a spot just left of the pad middle (stand there facing +x to drop onto the pad)
+	return _pad() + Vector3(-PAD_STAND, 0, 0)
+
+
 func _next_to(crate_name: String, side: float = -1.0) -> Vector3:
 	## This function gives a spot to stand beside a crate, on its -x side (or +x with side = 1)
 	# crate_name: which crate
@@ -37,6 +47,11 @@ func _next_to(crate_name: String, side: float = -1.0) -> Vector3:
 	var crate = _world.crate(crate_name)
 	var gap = 1.5 if crate.heavy else 1.0
 	return crate.global_position + Vector3(gap * side, 0.03, 0)
+
+
+func _prompt() -> String:
+	## This function gives the E hint our own player (1) sees right now
+	return _world.root.get_node("1/Interactor").prompt
 
 
 func _floor_under(spot: Vector3) -> float:
@@ -56,13 +71,13 @@ func _floor_under(spot: Vector3) -> float:
 func test_no_hint_with_nothing_in_reach() -> void:
 	_world.add_player(1, _world.airport.get_spawn(0).origin)
 	await await_millis(50)
-	assert_str(_cargo._prompt).is_empty()
+	assert_str(_prompt()).is_empty()
 
 
 func test_pick_up_and_drop_a_crate() -> void:
 	var me = _world.add_player(1, _next_to("Crate1"), FACE_OUT)
 	await await_millis(50)
-	assert_str(_cargo._prompt).is_equal("Press E to pick up")
+	assert_str(_prompt()).is_equal("Press E to pick up")
 
 	# picking up: we hold it, it is not solid, and it floats with us
 	_cargo.interact(1)
@@ -70,7 +85,7 @@ func test_pick_up_and_drop_a_crate() -> void:
 	assert_int(crate.holder_id).is_equal(1)
 	assert_int(crate.collision_layer).is_equal(0)
 	await await_millis(50)
-	assert_str(_cargo._prompt).is_equal("Press E to drop the crate")
+	assert_str(_prompt()).is_equal("Press E to drop the crate")
 
 	# dropping inside the terminal: on the floor, in front of us, solid again
 	_world.place(me, Vector3(-90, 0.45, -20), FACE_OUT)
@@ -88,9 +103,9 @@ func test_load_a_crate_on_the_pad() -> void:
 	var me = _world.add_player(1, _next_to("Crate1"), FACE_OUT)
 	_cargo.interact(1)
 
-	_world.place(me, PAD_LEFT, FACE_OUT)
+	_world.place(me, _pad_left(), FACE_OUT)
 	await await_millis(50)
-	assert_str(_cargo._prompt).is_equal("Press E to load the crate")
+	assert_str(_prompt()).is_equal("Press E to load the crate")
 	_cargo.interact(1)
 
 	var crate = _world.crate("Crate1")
@@ -103,14 +118,14 @@ func test_load_a_crate_on_the_pad() -> void:
 func test_a_loaded_crate_cannot_be_picked_up_again() -> void:
 	var me = _world.add_player(1, _next_to("Crate1"), FACE_OUT)
 	_cargo.interact(1)
-	_world.place(me, PAD_LEFT, FACE_OUT)
+	_world.place(me, _pad_left(), FACE_OUT)
 	_cargo.interact(1)
 
 	# standing right on top of it and pressing E again
 	var crate = _world.crate("Crate1")
 	_world.place(me, crate.global_position + Vector3(-1, 0.05, 0), FACE_OUT)
 	await await_millis(50)
-	assert_str(_cargo._prompt).is_empty()
+	assert_str(_prompt()).is_empty()
 	_cargo.interact(1)
 	assert_int(crate.holder_id).is_equal(0)
 	assert_bool(crate.loaded).is_true()
@@ -186,14 +201,14 @@ func test_leaving_while_carrying_drops_the_crate() -> void:
 func test_heavy_crate_cannot_be_lifted_alone() -> void:
 	var me = _world.add_player(1, _next_to("HeavyCrate1"), FACE_OUT)
 	await await_millis(50)
-	assert_str(_cargo._prompt).is_equal("Press E to grab (needs 2 players)")
+	assert_str(_prompt()).is_equal("Press E to grab (needs 2 players)")
 
 	_cargo.interact(1)
 	await await_millis(50)
 	var crate = _world.crate("HeavyCrate1")
 	assert_int(crate.holder_id).is_equal(1)
 	assert_bool(crate.is_lifted()).is_false()
-	assert_str(_cargo._prompt).is_equal("Waiting for a second player (E to let go)")
+	assert_str(_prompt()).is_equal("Waiting for a second player (E to let go)")
 	assert_float(me.speed_mul).is_equal(1.0)
 
 	# pressing E again lets go
@@ -214,10 +229,10 @@ func test_two_players_lift_carry_and_load_a_heavy_crate() -> void:
 	assert_float(me.speed_mul).is_equal(ManagerScript.HEAVY_SPEED)
 
 	# both walk to the pad, one on each side of its middle
-	_world.place(me, PAD + Vector3(-1.2, 0, 0))
-	_world.place(two, PAD + Vector3(1.2, 0, 0))
+	_world.place(me, _pad() + Vector3(-1.2, 0, 0))
+	_world.place(two, _pad() + Vector3(1.2, 0, 0))
 	await await_millis(50)
-	assert_str(_cargo._prompt).is_equal("Press E to load the crate")
+	assert_str(_prompt()).is_equal("Press E to load the crate")
 	_cargo.interact(2)
 
 	assert_bool(crate.loaded).is_true()
@@ -298,17 +313,17 @@ func test_heavy_crate_put_down_does_not_trap_its_carriers() -> void:
 
 func test_every_crate_fits_on_the_pad() -> void:
 	# loading all 8, one after another
-	var me = _world.add_player(1, PAD_LEFT, FACE_OUT)
-	var two = _world.add_player(2, PAD_LEFT, FACE_OUT)
+	var me = _world.add_player(1, _pad_left(), FACE_OUT)
+	var two = _world.add_player(2, _pad_left(), FACE_OUT)
 	for crate in _world.airport.get_node("Cargo/Crates").get_children():
 		if crate.heavy:
 			crate.set_holders(1, 2)
-			_world.place(me, PAD + Vector3(-1.2, 0, 0))
-			_world.place(two, PAD + Vector3(1.2, 0, 0))
+			_world.place(me, _pad() + Vector3(-1.2, 0, 0))
+			_world.place(two, _pad() + Vector3(1.2, 0, 0))
 			await await_millis(50)
 		else:
 			crate.set_holders(1)
-			_world.place(me, PAD_LEFT, FACE_OUT)
+			_world.place(me, _pad_left(), FACE_OUT)
 		_cargo.interact(1)
 		assert_bool(crate.loaded).override_failure_message("%s did not load" % crate.name).is_true()
 	assert_str(_counts.back()).is_equal("8/8")
@@ -342,9 +357,14 @@ func test_hud_shows_the_count_and_the_hint() -> void:
 	var hud = _cargo.get_node("CargoHud")
 	await await_millis(50)
 	assert_str(hud.get_node("%Counter").text).is_equal("Cargo 0/8 loaded")
-	assert_bool(hud.get_node("%PromptPanel").visible).is_false()
 
-	_world.add_player(1, _next_to("Crate1"), FACE_OUT)
+	# the hint is the shared prompt on our own player, hidden until something is in reach
+	var me = _world.add_player(1, _world.airport.get_spawn(0).origin)
+	var prompt = me.get_node("Interactor/InteractionPrompt")
 	await await_millis(50)
-	assert_bool(hud.get_node("%PromptPanel").visible).is_true()
-	assert_str(hud.get_node("%Prompt").text).is_equal("Press E to pick up")
+	assert_bool(prompt.get_node("%PromptPanel").visible).is_false()
+
+	_world.place(me, _next_to("Crate1"), FACE_OUT)
+	await await_millis(50)
+	assert_bool(prompt.get_node("%PromptPanel").visible).is_true()
+	assert_str(prompt.get_node("%Prompt").text).is_equal("Press E to pick up")

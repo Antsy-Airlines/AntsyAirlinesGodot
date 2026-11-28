@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://y86ityl727gn"
-path="res://.godot/imported/JohnDavisRig.glb-bb06b12683d8f1992ead2e9200399959.scn"
+path="res://.godot/imported/JohnDavisRig.glb-4cc9557653dc451e01838061b3e910f4.scn"
 
 [deps]
 
-source_file="res://assets/JohnDavisRig.glb"
-dest_files=["res://.godot/imported/JohnDavisRig.glb-bb06b12683d8f1992ead2e9200399959.scn"]
+source_file="res://assets/characters/JohnDavisRig.glb"
+dest_files=["res://.godot/imported/JohnDavisRig.glb-4cc9557653dc451e01838061b3e910f4.scn"]
 
 [params]
 
@@ -43,7 +43,7 @@ _subresources={
 "animations": {
 "Idle": {
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://assets/Animations/idle.res",
+"save_to_file/fallback_path": "res://assets/characters/animations/idle.res",
 "save_to_file/keep_custom_tracks": "",
 "save_to_file/path": "uid://crpcfy3pfkmng",
 "settings/loop_mode": 1,
@@ -2099,7 +2099,7 @@ _subresources={
 },
 "Walk": {
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://assets/Animations/walk.res",
+"save_to_file/fallback_path": "res://assets/characters/animations/walk.res",
 "save_to_file/keep_custom_tracks": "",
 "save_to_file/path": "uid://djuspwwb60q0r",
 "settings/loop_mode": 1,

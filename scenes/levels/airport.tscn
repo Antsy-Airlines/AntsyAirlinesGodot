@@ -38,7 +38,7 @@
 [ext_resource type="Script" uid="uid://6tlyuq8f1ju" path="res://scripts/gameplay/cargo_manager.gd" id="37_cargo"]
 [ext_resource type="PackedScene" path="res://scenes/props/cargo_crate.tscn" id="38_crate"]
 [ext_resource type="PackedScene" path="res://scenes/ui/cargo_hud.tscn" id="39_cargo_hud"]
-[ext_resource type="PackedScene" uid="uid://ex5h8kq02cut" path="res://assets/airplane_mvp.glb" id="40_h800k"]
+[ext_resource type="PackedScene" uid="uid://br5bfnmxhpnco" path="res://scenes/Plane.tscn" id="40_h800k"]
 [ext_resource type="PackedScene" path="res://scenes/props/heavy_crate.tscn" id="40_heavy"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
@@ -139,19 +139,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 130, 0.03, 134.6)
 [node name="Planes" type="Node3D" parent="." unique_id=1123557774]
 
 [node name="Airplane1" parent="Planes" unique_id=1693033765 instance=ExtResource("4_airplane_1")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -21.2, 0, 111.78)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -21.2, 0, 136.78)
 
 [node name="Airplane2" parent="Planes" unique_id=1268173214 instance=ExtResource("5_airplane_2")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -13.5, 0, 38.36)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -13.5, 0, 59.36)
 
 [node name="Airplane3" parent="Planes" unique_id=1254175775 instance=ExtResource("6_airplane_3")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -19.9, 0, -25.58)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -36.64541, 0, -147.62456)
 
 [node name="Airplane4" parent="Planes" unique_id=468633172 instance=ExtResource("7_airplane_4")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -41.8, 0, -93.57)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -41.8, 0, -89.81842)
 
 [node name="JetBridge" parent="Planes" unique_id=661024827 instance=ExtResource("23_jet_bridge")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -49.6, 0, -21.9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -49.6, 0, 30.1)
 
 [node name="AirplaneStairs" parent="Planes" unique_id=224383633 instance=ExtResource("8_airplane_stairs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 0, -86)
@@ -445,7 +445,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91.4, 0.42, -13.6)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -91.4, 0.42, -11.2)
 
 [node name="HoldZone" type="Node3D" parent="Cargo" unique_id=450855675]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37, 0.02, -35)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -63.392452, 0.02, -43.318787)
 
 [node name="Pad" type="MeshInstance3D" parent="Cargo/HoldZone" unique_id=1761680039]
 mesh = SubResource("PlaneMesh_hold")
@@ -461,5 +461,5 @@ outline_size = 14
 
 [node name="CargoHud" parent="Cargo" unique_id=1770116718 instance=ExtResource("39_cargo_hud")]
 
-[node name="airplane_mvp" parent="." unique_id=932656560 instance=ExtResource("40_h800k")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50.917984, 4.217499, -48.875267)
+[node name="Plane" parent="." unique_id=1166477692 instance=ExtResource("40_h800k")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -40.00808, 3.3974717, -43.837536)
