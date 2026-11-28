@@ -7,6 +7,7 @@ extends SceneTree
 const LOBBY_SCENE := "res://scenes/levels/lobby.tscn" # where a player waits and plays
 const IDLE_LIMIT := 90.0 # seconds without a command before the bot closes itself (in case the test died)
 const HEAVY_GAP := 1.5 # metres from a heavy crate to stand when grabbing it
+const PAD_STAND := 1.5 # metres left of the hold pad middle to stand when loading
 const LIGHT_GAP := 1.0 # metres from a light crate to stand when picking it up
 
 # Declaring tracking variables
@@ -100,6 +101,8 @@ func _run(parts: PackedStringArray) -> bool:
 			_tp(Vector3(parts[1].to_float(), parts[2].to_float(), parts[3].to_float()), parts[4].to_float())
 		"near": # near <crate> <side>: stand beside a crate facing it, side -1 is its -x side
 			_stand_near(parts[1], parts[2].to_float())
+		"pad": # pad: stand just left of the hold pad middle, facing +x so a drop lands on it
+			_stand_at_pad()
 		"press": # press E
 			_press_interact()
 		"leave": # leave the lobby on purpose
@@ -152,6 +155,12 @@ func _stand_near(crate_name: String, side: float) -> void:
 	var crate = _cargo().get_node("Crates/" + crate_name)
 	var gap = HEAVY_GAP if crate.heavy else LIGHT_GAP
 	_tp(crate.global_position + Vector3(gap * side, 0.05, 0), -90.0 * side)
+
+
+func _stand_at_pad() -> void:
+	## This function moves our player just left of the hold pad middle, facing +x (read from the level)
+	var middle = _cargo().get_node("HoldZone").global_position
+	_tp(Vector3(middle.x - PAD_STAND, 0.05, middle.z), 90.0)
 
 
 func _press_interact() -> void:

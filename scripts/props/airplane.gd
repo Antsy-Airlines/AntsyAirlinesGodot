@@ -13,6 +13,10 @@ extends Node3D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# the model's "-col" meshes import as one-sided trimeshes; players are inside the fuselage, so block both ways
+	for s in find_children("*", "CollisionShape3D", true, false):
+		if s.shape is ConcavePolygonShape3D:
+			s.shape.backface_collision = true
 	# TEMPORARY (testing): throwing the shift handle starts the propellers and retracts the gear
 	shift_handle.toggled.connect(_on_shift_handle_toggled)
 

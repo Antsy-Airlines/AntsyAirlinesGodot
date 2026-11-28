@@ -4,8 +4,9 @@ extends "res://test/helpers/net_suite.gd"
 
 # Declaring Default/Const variables
 const INSIDE := "-90 0.45 -20 90" # open floor inside the terminal, facing +x
-const PAD_LEFT := "-38.5 0.05 -35 90" # just left of the hold pad middle, facing +x so a drop lands on it
 const SYNC_WAIT := 400 # ms for a teleport to reach the server before pressing E
+const PRESS_TRIES := 6 # times to press E before giving up
+const PRESS_WAIT := 1.5 # seconds to wait for a press to show up before pressing again
 
 # Declaring tracking variables
 var _a_id: int = 0 # peer id of bot a
@@ -31,6 +32,24 @@ func _do(bot: String, cmd: String) -> void:
 	await await_millis(SYNC_WAIT)
 
 
+func _press(bot: String, watcher: String, check: Callable) -> Dictionary:
+	## This function presses E and waits for what it should do, pressing again if the server turned it down,
+	## and returns the watcher's last state.
+	## Just after spawning, the server can ignore a player's moves for a few seconds (other computers already
+	## see them), so it checks the press against where the player spawned and quietly refuses it.
+	# bot: which bot presses
+	# watcher: which bot to watch for the result
+	# check: func(state) -> bool, true once the press did its job
+	var s = {}
+	for attempt in PRESS_TRIES:
+		await _wait_for(bot, func(st): return st.get("prompt", "") != "", 3.0)
+		await _send(bot, "press")
+		s = await _wait_for(watcher, check, PRESS_WAIT)
+		if not s.is_empty() and check.call(s):
+			return s
+	return s
+
+
 func _same_place(a: Array, b: Array, tolerance: float = 0.1) -> bool:
 	## This function says if two positions from bot states are the same spot
 	# a, b: [x, y, z]
@@ -41,17 +60,15 @@ func _same_place(a: Array, b: Array, tolerance: float = 0.1) -> bool:
 func test_picking_up_and_dropping_shows_on_every_computer() -> void:
 	await _start_game()
 	await _do("a", "near Crate1 -1")
-	await _send("a", "press")
 
 	# b sees a carrying it
-	var b = await _wait_for("b", func(s): return _crate(s, "Crate1").holder == _a_id)
+	var b = await _press("a", "b", func(s): return _crate(s, "Crate1").holder == _a_id)
 	assert_int(int(_crate(b, "Crate1").holder)).is_equal(_a_id)
 	assert_bool(_crate(b, "Crate1").lifted).is_true()
 
 	# dropping inside the terminal: both see it on the floor in the same spot
 	await _do("a", "tp " + INSIDE)
-	await _send("a", "press")
-	b = await _wait_for("b", func(s): return _crate(s, "Crate1").holder == 0)
+	b = await _press("a", "b", func(s): return _crate(s, "Crate1").holder == 0)
 	var a = await _send("a", "state")
 	assert_int(int(_crate(b, "Crate1").holder)).is_equal(0)
 	assert_float(_crate(b, "Crate1").pos[1]).is_equal_approx(0.42, 0.05)
@@ -61,12 +78,10 @@ func test_picking_up_and_dropping_shows_on_every_computer() -> void:
 func test_loading_counts_on_every_computer() -> void:
 	await _start_game()
 	await _do("a", "near Crate1 -1")
-	await _send("a", "press")
-	await _wait_for("a", func(s): return _crate(s, "Crate1").holder == _a_id)
-	await _do("a", "tp " + PAD_LEFT)
-	await _send("a", "press")
+	await _press("a", "a", func(s): return _crate(s, "Crate1").holder == _a_id)
+	await _do("a", "pad")
 
-	var b = await _wait_for("b", func(s): return s.loaded == 1)
+	var b = await _press("a", "b", func(s): return s.loaded == 1)
 	assert_int(int(b.loaded)).is_equal(1)
 	assert_bool(_crate(b, "Crate1").loaded).is_true()
 	var a = await _wait_for("a", func(s): return s.loaded == 1)
@@ -80,7 +95,9 @@ func test_two_players_pressing_on_one_crate_at_once() -> void:
 	var spot = a.players[str(_a_id)].pos
 	await _do("b", "tp %f %f %f 90" % [spot[0], spot[1] + 0.05, spot[2] + 0.7])
 
-	# both press right after each other
+	# both press right after each other (once both screens offer the pick up)
+	await _wait_for("a", func(s): return s.get("prompt", "") != "", 3.0)
+	await _wait_for("b", func(s): return s.get("prompt", "") != "", 3.0)
 	await _send("a", "press")
 	await _send("b", "press")
 	await await_millis(1500)
@@ -101,14 +118,12 @@ func test_heavy_crate_lifts_slows_and_drops_when_apart() -> void:
 	await _do("b", "near HeavyCrate1 1")
 
 	# a grabs one side: nothing lifts yet
-	await _send("a", "press")
-	var b = await _wait_for("b", func(s): return _crate(s, "HeavyCrate1").holder == _a_id)
+	var b = await _press("a", "b", func(s): return _crate(s, "HeavyCrate1").holder == _a_id)
 	assert_bool(_crate(b, "HeavyCrate1").lifted).is_false()
 	assert_str(b.prompt).is_equal("Press E to help lift")
 
 	# b takes the other side: lifted on both computers, and both walk slower
-	await _send("b", "press")
-	b = await _wait_for("b", func(s): return _crate(s, "HeavyCrate1").lifted and s.speed < 1.0)
+	b = await _press("b", "b", func(s): return _crate(s, "HeavyCrate1").lifted and s.speed < 1.0)
 	var a = await _wait_for("a", func(s): return _crate(s, "HeavyCrate1").lifted and s.speed < 1.0)
 	assert_int(int(_crate(a, "HeavyCrate1").helper)).is_equal(_b_id)
 	assert_float(a.speed).is_equal_approx(0.6, 0.01)
@@ -126,8 +141,7 @@ func test_heavy_crate_lifts_slows_and_drops_when_apart() -> void:
 func test_leaving_while_carrying_drops_the_crate_for_the_others() -> void:
 	await _start_game()
 	await _do("a", "near Crate1 -1")
-	await _send("a", "press")
-	await _wait_for("b", func(s): return _crate(s, "Crate1").holder == _a_id)
+	await _press("a", "b", func(s): return _crate(s, "Crate1").holder == _a_id)
 	await _do("a", "tp " + INSIDE)
 
 	await _send("a", "leave")
@@ -140,10 +154,8 @@ func test_a_heavy_carrier_leaving_drops_it() -> void:
 	await _start_game()
 	await _do("a", "near HeavyCrate1 -1")
 	await _do("b", "near HeavyCrate1 1")
-	await _send("a", "press")
-	await _wait_for("b", func(s): return _crate(s, "HeavyCrate1").holder == _a_id)
-	await _send("b", "press")
-	await _wait_for("a", func(s): return _crate(s, "HeavyCrate1").lifted)
+	await _press("a", "b", func(s): return _crate(s, "HeavyCrate1").holder == _a_id)
+	await _press("b", "a", func(s): return _crate(s, "HeavyCrate1").lifted)
 
 	await _send("b", "leave")
 	var a = await _wait_for("a", func(s): return _crate(s, "HeavyCrate1").holder == 0 and s.speed == 1.0)
@@ -157,23 +169,19 @@ func test_a_late_joiner_sees_every_crate_as_it_is() -> void:
 
 	# a loads Crate1
 	await _do("a", "near Crate1 -1")
-	await _send("a", "press")
-	await _wait_for("a", func(s): return _crate(s, "Crate1").holder == _a_id)
-	await _do("a", "tp " + PAD_LEFT)
-	await _send("a", "press")
-	await _wait_for("a", func(s): return s.loaded == 1)
+	await _press("a", "a", func(s): return _crate(s, "Crate1").holder == _a_id)
+	await _do("a", "pad")
+	await _press("a", "a", func(s): return s.loaded == 1)
 
 	# then a and b hold HeavyCrate1 up in the air
 	await _do("a", "near HeavyCrate1 -1")
 	await _do("b", "near HeavyCrate1 1")
-	await _send("a", "press")
-	await _wait_for("b", func(s): return _crate(s, "HeavyCrate1").holder == _a_id)
-	await _send("b", "press")
-	var a = await _wait_for("a", func(s): return _crate(s, "HeavyCrate1").lifted)
+	await _press("a", "b", func(s): return _crate(s, "HeavyCrate1").holder == _a_id)
+	var a = await _press("b", "a", func(s): return _crate(s, "HeavyCrate1").lifted)
 
 	# c joins now and must see the same
 	var c = await _joined("c")
-	c = await _wait_for("c", func(s): return s.loaded == 1 and _crate(s, "HeavyCrate1").lifted)
+	c = await _wait_for("c", func(s): return s.loaded == 1 and _crate(s, "HeavyCrate1").lifted and _crate(s, "HeavyCrate1").pos[1] > 0.6)
 	assert_int(int(c.loaded)).is_equal(1)
 	assert_bool(_crate(c, "Crate1").loaded).is_true()
 	assert_bool(_same_place(_crate(a, "Crate1").pos, _crate(c, "Crate1").pos)).override_failure_message("c sees the loaded crate somewhere else").is_true()
@@ -183,6 +191,8 @@ func test_a_late_joiner_sees_every_crate_as_it_is() -> void:
 
 	# c sees a and b standing where they really are, so the crate floats in the same place too
 	# (positions of players who stand still can take a moment to reach a new computer)
+	# a's view is read again now: the snapshot from the moment of lifting can catch the crate still rising
+	a = await _send("a", "state")
 	var check = func(s):
 		for id in [_a_id, _b_id]:
 			if not _same_place(s.players[str(id)].pos, a.players[str(id)].pos):
@@ -190,5 +200,5 @@ func test_a_late_joiner_sees_every_crate_as_it_is() -> void:
 		return _same_place(_crate(s, "HeavyCrate1").pos, _crate(a, "HeavyCrate1").pos)
 	c = await _wait_for("c", check, 5.0)
 	for id in [_a_id, _b_id]:
-		assert_bool(_same_place(c.players[str(id)].pos, a.players[str(id)].pos)).override_failure_message("c sees player %d at %s" % [id, c.players[str(id)].pos]).is_true()
-	assert_bool(_same_place(_crate(a, "HeavyCrate1").pos, _crate(c, "HeavyCrate1").pos)).override_failure_message("c sees the heavy crate somewhere else").is_true()
+		assert_bool(_same_place(c.players[str(id)].pos, a.players[str(id)].pos)).override_failure_message("c sees player %d at %s, a sees %s" % [id, c.players[str(id)].pos, a.players[str(id)].pos]).is_true()
+	assert_bool(_same_place(_crate(a, "HeavyCrate1").pos, _crate(c, "HeavyCrate1").pos)).override_failure_message("c sees the heavy crate at %s, a at %s" % [_crate(c, "HeavyCrate1").pos, _crate(a, "HeavyCrate1").pos]).is_true()
